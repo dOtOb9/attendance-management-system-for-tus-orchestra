@@ -1,0 +1,18 @@
+{
+  "dependencies": {
+    "punycode": "^2.3.1"
+  },
+  "name": "attendance-management-system-for-tus-orchestra",
+  "description": "スプレッドシートを用いた東京理科大学管弦楽団の出欠管理システム",
+  "version": "1.0.0",
+  "main": "index.js",
+  "devDependencies": {
+    "@types/google-apps-script": "^1.0.83"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
