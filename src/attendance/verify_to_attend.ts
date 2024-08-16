@@ -20,6 +20,31 @@ class verifyToAttend {
 
         if (todayRows.length === 0) return '本日は練習日ではありません。';
 
+        const today = new Today();
+
+        const nowTermRows = (term=today.amOrPm()==='午前') => {
+            if (term) {
+                return todayRows.filter(row => row[2] === '1' || row[2] === '2');
+            } else {
+                return todayRows.filter(row => row[2] === '3' || row[2] === '4');
+            }
+        }
+
+        const rows = nowTermRows();
         
+        let attend_flag = false;
+        rows.forEach(row => {
+            const sheet = row[2] === 'TRUE' ? this.bookshelf.tutti_attending_tables.getSheet(row[3]) : this.bookshelf.normal_attending_tables.getSheet(row[3]);
+
+            const userRow = sheet.reserchUser(this.user.id);
+
+            if (sheet.getCellValue(userRow, parseInt(row[4], 10)) === '') {
+                sheet.setCellValue(userRow, parseInt(row[4], 10), '出席');
+                attend_flag = true;
+            } 
+        });
+
+        if (attend_flag) return '出席を確認しました。';
+        else return `既にに入力されています。`;
     }
 }
