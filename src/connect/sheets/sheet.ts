@@ -43,7 +43,7 @@ class Sheet {
     const users: Array<User> = [];
     for (let i = 1; i < this.data.length; ++i) {
       features.forEach(feature => {
-        if(this.data[i][col] === feature){
+        if(this.data[i][col+1] === feature){
           users.push(new User(this.data[i][col], currentBookshelf));
         }
       });

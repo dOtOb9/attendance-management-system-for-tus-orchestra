@@ -46,8 +46,22 @@ function regular() {
                 parts.concat(part);
             }
         });
+        let program;
+        switch (row[2]) {
+            case '前曲':
+                program = 1;
+                break;
+
+            case '中曲':
+                program = 2;
+                break;
+            
+            case 'メイン曲':
+                program = 3;
+                break;
+        }
         
-        const users = group.isParts(parts).group;
+        const users = group.isParts(parts).isConcertPlayers(scheduleSheet, bookshelf, program).group;
         
         const colNumber = parseInt(row[4], 10);
         

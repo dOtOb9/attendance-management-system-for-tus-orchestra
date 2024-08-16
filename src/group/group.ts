@@ -50,8 +50,9 @@ class Group {
         return newGroup;
     }
 
-    private isConcertPlayers(sheet: Sheet=this.sheet, bookshelf: Bookshelf=this.bookshelf): Group {
-        const users = sheet.getGroupArray(8, ['TRUE'], bookshelf);
+    public isConcertPlayers(sheet: Sheet=this.sheet, bookshelf: Bookshelf=this.bookshelf, program: number=3): Group {
+
+        const users = sheet.getGroupArray(program+4, ['TRUE'], bookshelf);
         const newGroup = new Group(sheet, bookshelf, users);
         return newGroup;
     }
