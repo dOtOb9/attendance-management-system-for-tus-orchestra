@@ -1,12 +1,16 @@
 class Today {
-    private text: string;
+    private readonly today: Date;
 
     constructor(){
-        const today = new Date();
-        this.text = Utilities.formatDate(today, 'Asia/Tokyo', 'yyyy/MM/dd');
+        this.today = new Date();
     }
 
     public toString(): string {
-        return this.text;
+        return Utilities.formatDate(this.today, 'Asia/Tokyo', 'yyyy/MM/dd');
     }
+
+    public amOrPm(): string {
+        return this.today.getHours() < 12 ? '午前' : '午後';
+    }
+
 }

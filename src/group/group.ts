@@ -51,7 +51,7 @@ class Group {
     }
 
     private isConcertPlayers(sheet: Sheet=this.sheet, bookshelf: Bookshelf=this.bookshelf): Group {
-        const users = sheet.getGroupArray(8, ['true'], bookshelf);
+        const users = sheet.getGroupArray(8, ['TRUE'], bookshelf);
         const newGroup = new Group(sheet, bookshelf, users);
         return newGroup;
     }

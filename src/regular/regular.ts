@@ -24,8 +24,16 @@ function regular() {
 
     const todayRows = scheduleSheet.getValueRowsFromUpper(today.toString(), 0);
 
+    const nowTermRows = (term=today.amOrPm()==='午前') => {
+        if (term) {
+            return todayRows.filter(row => row[2] === '1' || row[2] === '2');
+        } else {
+            return todayRows.filter(row => row[2] === '3' || row[2] === '4');
+        }
+    }
     
-    todayRows.forEach(row => {
+    const rows = nowTermRows();
+    rows.forEach(row => {
         const book = row[1] === 'TRUE' ? bookshelf.tutti_attending_tables : bookshelf.normal_attending_tables;
         const sheet = book.getSheet(row[3]);
         
@@ -45,7 +53,9 @@ function regular() {
         
         users.forEach(user => {
             const userRow = sheet.reserchUser(user.id);
-            sheet.setCellValue(userRow, colNumber, '欠席');
+            if (sheet.getCellValue(userRow, colNumber) === '') {
+                sheet.setCellValue(userRow, colNumber, '欠席');    
+            };
         })
     });
     
