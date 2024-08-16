@@ -7,7 +7,7 @@ class AttendanceCode {
         this.code = this.pass_sheet.getCellValue(1, 0);
     }
 
-    public isRight(code: string): boolean {
+    public isDifferentFrom(code: string): boolean {
         return this.code === code;
     }
 
@@ -28,7 +28,7 @@ class AttendanceCode {
                 embeds: [
                     {
                         title: `${this.code}`,
-                        description: `${new Today().toString()}の${timeArea}の出席認証コード`,
+                        description: `${new Today().toString()}\n${timeArea}\nの出席認証コード`,
                         color: parseInt('ff8000', 16),
                     }
                 ]

@@ -10,11 +10,18 @@ class Sheet {
     const last_col = sheet.getLastColumn();
 
     //入力されているのデータ全体を取得
-    this.data = sheet.getRange(1, 1, last_row, last_col).getValues();
+    this.data = sheet.getRange(1, 1, last_row, last_col).getDisplayValues();
+  }
+
+  public hasValueRow(value: string, col: number): boolean {
+    for (let i = 1; i < this.data.length; ++i) {
+      if (this.data[i][col] === value) return true;
+    }
+    return false;
   }
 
   // ユーザーの行位置を返す
-  private reserchUser(id: string): number {
+  public reserchUser(id: string): number {
     let rowNumber = 0;
     for (let i = 1; i < this.data.length; ++i) {
       if (this.data[i][1] === id) rowNumber = i;
@@ -45,9 +52,10 @@ class Sheet {
     return users;
   }
 
-  createColumnsLeft(col: number=5, rows: number=1): void {
+  public createColumnsLeft(value: string, col: number, rows: number): String {
     this.sheet.insertColumnsBefore(col+1, rows);
-    this.sheet.getRange(1, col+1).setValue(this.data[0][col+1] + 1);
+    this.sheet.getRange(1, col+1).setValue(value);
+    return (this.data[0].length - col).toString();
   }
 
   createRowsBottom(values: Array<Array<string>>) {
@@ -55,7 +63,25 @@ class Sheet {
     this.sheet.getRange(this.data.length+1, 1, values.length, values[0].length).setValues(values);
   }
 
-  setCellValue(row: number, col: number, value: string) {
+  setCellValue(row: number, col: number, value: String) {
     this.sheet.getRange(row+1, col+1).setValue(value);
+  }
+
+  public lastRow(): number {
+    return this.data.length;
+  }
+
+  public lastCol(): number {
+    return this.data[0].length;
+  }
+
+  public getValueRowsFromUpper(value: string, col: number): Array<Array<string>> {
+    const valueRows: Array<Array<string>> = [];
+    for (let i = 1; i < this.data.length; ++i) {
+      if (this.data[i][col] === value) {
+        valueRows.push(this.data[i]);
+      }
+    }
+    return valueRows;
   }
 }
