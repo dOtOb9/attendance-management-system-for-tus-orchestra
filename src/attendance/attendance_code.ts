@@ -8,7 +8,7 @@ class AttendanceCode {
     }
 
     public isDifferentFrom(code: string): boolean {
-        return this.code === code;
+        return this.code !== code;
     }
 
     public replace() {

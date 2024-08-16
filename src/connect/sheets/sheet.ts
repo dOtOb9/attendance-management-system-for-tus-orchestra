@@ -43,13 +43,20 @@ class Sheet {
     const users: Array<User> = [];
     for (let i = 1; i < this.data.length; ++i) {
       features.forEach(feature => {
-        if(this.data[i][col+1] === feature){
-          users.push(new User(this.data[i][col], currentBookshelf));
+        if(this.data[i][col] === feature){
+          users.push(new User(this.data[i][1], currentBookshelf));
         }
       });
       
     }
     return users;
+  }
+
+  getValueColumnFromLeft(value: string): number {
+    for (let i = 0; i < this.data[0].length; ++i) {
+      if (this.data[0][i] === value) return i;
+    }
+    return -1;
   }
 
   public createColumnsLeft(value: string, col: number, rows: number): String {
@@ -83,5 +90,9 @@ class Sheet {
       }
     }
     return valueRows;
+  }
+
+  public getColumnsLength(): number {
+    return this.data[0].length;
   }
 }

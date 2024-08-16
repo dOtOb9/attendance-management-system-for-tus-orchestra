@@ -2,6 +2,7 @@ function regular() {
     const bookshelf = new Bookshelf();
 
     const scheduleSheet = bookshelf.user_info_tables.getSheet('練習予定');
+    const UserInfoSheet = bookshelf.user_info_tables.getSheet('ユーザー設定');
 
     const noneValueRows = scheduleSheet.getValueRowsFromUpper('', 4);
     
@@ -37,16 +38,17 @@ function regular() {
         const book = row[1] === 'TRUE' ? bookshelf.tutti_attending_tables : bookshelf.normal_attending_tables;
         const sheet = book.getSheet(row[3]);
         
-        const group = new Group(sheet, bookshelf);
+        const group = new Group(UserInfoSheet, bookshelf);
         
         let count = 0;
         const parts: Array<string> = [];
         [group.strings, group.brass, group.woodwind, group.percussion, group.orchestra].forEach(part => {
             if (row[5+count] === 'TRUE') {
-                parts.concat(part);
+                parts.push(...part);
             }
+            count++;
         });
-        let program;
+        let program: number;
         switch (row[2]) {
             case '前曲':
                 program = 1;
@@ -59,9 +61,9 @@ function regular() {
             case 'メイン曲':
                 program = 3;
                 break;
-        }
+        };
         
-        const users = group.isParts(parts).isConcertPlayers(scheduleSheet, bookshelf, program).group;
+        const users = group.isConcertPlayers().and(group.isParts(parts)).users;
         
         const colNumber = parseInt(row[4], 10);
         
@@ -73,7 +75,7 @@ function regular() {
         })
     });
     
-    if (todayRows.length === 0) return;
+    if (rows.length === 0) return;
     
     if (scheduleSheet.hasValueRow(today.toString(), 0)) {
         const attendanceCode = new AttendanceCode(bookshelf);

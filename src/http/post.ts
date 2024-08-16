@@ -27,5 +27,5 @@ function doPost(e) {
         }
         return '返り値がありません';
     }
-    return response_text;
+    return ContentService.createTextOutput(response_text());
 }

@@ -1,15 +1,15 @@
 class Group {
     private readonly bookshelf: Bookshelf;
     private readonly sheet: Sheet;
-    public readonly group: Array<User>;
+    public readonly users: Array<User>;
     public readonly strings: Array<string> = ['Vn', 'Va', 'Vc', 'Cb'];
     public readonly brass: Array<string> = ['Trb', 'Tp', 'Hr'];
     public readonly woodwind: Array<string> = ['Fl', 'Ob', 'Cl', 'Fg'];
     public readonly percussion: Array<string> = ['Perc'];
     public readonly orchestra: Array<string> = this.strings.concat(this.brass, this.woodwind, this.percussion);
 
-    constructor(sheet: Sheet, bookshelf: Bookshelf, group: Array<User>=new Array<User>()) {
-        this.group = group;
+    constructor(sheet: Sheet, bookshelf: Bookshelf, users: Array<User>=new Array<User>()) {
+        this.users = users;
         this.sheet = sheet;
         this.bookshelf = bookshelf;
     }
@@ -33,13 +33,13 @@ class Group {
         }
     }
 
-    private and(other: Group): Group {
-        const newGroup = new Group(this.sheet, this.bookshelf, this.group.filter(user => other.group.includes(user)));
+    public and(other: Group): Group {
+        const newGroup = new Group(this.sheet, this.bookshelf, this.users.filter(user => other.users.includes(user)));
         return newGroup;
     }
 
-    private or(other: Group): Group {
-        const newGroup = new Group(this.sheet, this.bookshelf, this.group.concat(other.group));
+    public or(other: Group): Group {
+        const newGroup = new Group(this.sheet, this.bookshelf, this.users.concat(other.users));
         return newGroup;
     }
 
@@ -50,7 +50,7 @@ class Group {
         return newGroup;
     }
 
-    public isConcertPlayers(sheet: Sheet=this.sheet, bookshelf: Bookshelf=this.bookshelf, program: number=3): Group {
+    public isConcertPlayers(sheet: Sheet=this.sheet, bookshelf: Bookshelf=this.bookshelf, program: number=4): Group {
 
         const users = sheet.getGroupArray(program+4, ['TRUE'], bookshelf);
         const newGroup = new Group(sheet, bookshelf, users);
@@ -58,7 +58,7 @@ class Group {
     }
 
     discordFormat(): string {
-        const userIds = this.group.map(user => user.id);
+        const userIds = this.users.map(user => user.id);
         return JSON.stringify(userIds);
     }
 }

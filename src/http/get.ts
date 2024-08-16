@@ -7,7 +7,7 @@ function doGet(e) {
 
     switch (mode) {
         case 'dashboard':
-            return HtmlService.createHtmlOutputFromFile('dashboard');
+            return HtmlService.createHtmlOutputFromFile('src/views/dashboard');
 
         case 'user_data':
             const user = new User(e.parameter.id, bookshelf);

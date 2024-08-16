@@ -5,6 +5,7 @@ class User {
 
     constructor(id: string, bookshelf: Bookshelf) {
         this.attend_status = new AttendStatus(id);
+        this.id = id;
         this.import(bookshelf);
     }
 
