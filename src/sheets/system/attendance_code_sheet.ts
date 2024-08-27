@@ -6,6 +6,10 @@ class AttendanceCodeSheet extends Sheet {
         this.code = this.data[2][1];
     }
 
+    public isRightCode(code: string): boolean {
+        return code === this.code;
+    }
+
     public replaceCode(notice=true) {
         this.code = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
         
@@ -17,7 +21,7 @@ class AttendanceCodeSheet extends Sheet {
     private sendDiscord(code: string) {
         const today = new Today();
 
-        UrlFetchApp.fetch(PropertiesService.getScriptProperties().getProperty('AttendanceDiscordBotUrl'), {
+        UrlFetchApp.fetch(PropertiesService.getScriptProperties().getProperty('AttendanceDiscordBotURL'), {
             method: 'post',
             contentType: 'application/json',
             payload: JSON.stringify({

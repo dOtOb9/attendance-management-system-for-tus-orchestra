@@ -1,6 +1,6 @@
-class AdministerActivityBook extends Book {
+class AdminActivityBook extends Book {
     constructor() {
-        super("administerActivityBookID");
+        super("adminActivityBookID");
     }
 
     public getScheduleSheet() {

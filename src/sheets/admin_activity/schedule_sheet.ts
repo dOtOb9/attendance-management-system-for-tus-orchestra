@@ -1,5 +1,24 @@
 class ScheduleSheet extends Sheet {
 
+    // 現在の練習コマの情報を取得する
+    public getNowTermRow(): Array<Array<string>> {
+        const today = new Today();
+        const todayText = today.toString();
+        const todayTimeArea = today.getTimeArea();
+
+        const todayRows = this.data.filter(row => row[1] === todayText);
+
+        const nowTermRows = todayRows.filter(row => {
+            if (todayTimeArea === "午前") {
+                return row[2] === "1" || row[2] === "2";
+            } else {
+                return row[2] === "3" || row[2] === "4";
+            }
+        })
+
+        return nowTermRows;
+    }
+
     public setActivityDate(): void {
         // 列名が空白の行だけ取得
         const noneSetDateRows = this.data.filter(row => row[5] === "");

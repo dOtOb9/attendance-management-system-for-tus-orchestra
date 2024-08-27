@@ -1,5 +1,5 @@
 function regular() {
-    const scheduleSheet = new AdministerActivityBook().getScheduleSheet();
+    const scheduleSheet = new AdminActivityBook().getScheduleSheet();
 
     // 出欠列を生成
     scheduleSheet.setActivityDate();

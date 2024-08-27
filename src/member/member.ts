@@ -7,7 +7,7 @@ class Member {
     }
 
     public addContactList() {
-        const membersInfoSheet = new AdministerActivityBook().getMembersInfoSheet();
+        const membersInfoSheet = new AdminActivityBook().getMembersInfoSheet();
 
         membersInfoSheet.addContactList(this.id);
     }
@@ -15,7 +15,7 @@ class Member {
     public edit(MemberRow: Array<string>) {
         MemberRow[0] = `=HYPERLINK("https://discord.com/users/${MemberRow[1]}", "${MemberRow[0]}")`;
         
-        const memberInfoSheet = new AdministerActivityBook().getMembersInfoSheet();
+        const memberInfoSheet = new AdminActivityBook().getMembersInfoSheet();
 
         memberInfoSheet.editMember(MemberRow);
 
