@@ -4,8 +4,8 @@ function doPost(e) {
     const response_text = (mode=jsonData.mode) => {
         switch (mode) {
             case 'edit_user':{
-                const member = new Member(jsonData.id);
-                member.edit(memberRow);
+                const member = new Member(jsonData.id, jsonData.name, jsonData.part, jsonData.grade);
+                member.edit();
                 break;
             }
             case 'belong_contact_list':{

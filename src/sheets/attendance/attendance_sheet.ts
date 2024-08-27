@@ -30,4 +30,20 @@ class AttendanceSheet extends MemberSheet {
             values
         );
     }
+
+    override editMember(memberRow: Array<string>) {
+        const newRowNumber = this.data.length;
+
+        // 練習回数
+        const activityNumber = `=COUNTIF(G${newRowNumber}:${newRowNumber}, "出席")+COUNTIF(G${newRowNumber}:${newRowNumber}, "欠席")+COUNTIF(G${newRowNumber}:${newRowNumber}, "遅刻")+COUNTIF(G${newRowNumber}:${newRowNumber}, "早退")`;
+        // 出席回数
+        const attendanceNumber = `=(COUNTIF(G${newRowNumber}:${newRowNumber}, "出席"))+(COUNTIF(G${newRowNumber}:${newRowNumber}, "遅刻"))*0.5+(COUNTIF(G${newRowNumber}:${newRowNumber}, "早退"))*0.5`;
+        // 出席率
+        const attendanceRate = `=D${newRowNumber}/MAX(C${newRowNumber})`;
+
+        // 出欠表用の行を作成する
+        const attendanceMemberRow = [memberRow[0], memberRow[1], activityNumber, attendanceNumber, attendanceRate, memberRow[2], memberRow[3]];
+
+        super.editMember(attendanceMemberRow);
+    }
 }

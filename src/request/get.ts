@@ -1,8 +1,6 @@
 function doGet(e) {
     const mode = e.parameter.mode;
 
-    const bookshelf = new Bookshelf();
-
     let response_text: string;
 
     switch (mode) {
@@ -10,15 +8,15 @@ function doGet(e) {
             return HtmlService.createHtmlOutputFromFile('src/views/dashboard');
 
         case 'user_data':
-            const user = new User(e.parameter.id, bookshelf);
+            const user = new Member(e.parameter.id);
             response_text = user.attend_status.discordFormat();
             return ContentService.createTextOutput(response_text);
 
         case 'can_send_activity_dm':
-            const sheet = bookshelf.user_info_tables.getSheet('ユーザー設定');
+            const sheet = new AdminActivityBook().getMembersInfoSheet();
 
-            const rows = sheet.getValueRowsFromUpper('TRUE', 8);
-            
+            const contactListRows = sheet.getContactListRows();
+
             let memberList = [];
             
             let part = [];
@@ -44,7 +42,7 @@ function doGet(e) {
                     part = ['Vn', 'Va', 'Vc', 'Cb', 'Tp', 'Hr', 'Trb', 'Fl', 'Fg', 'Ob', 'Cl', 'Perc'];
             }
 
-            rows.forEach(row => {
+            contactListRows.forEach(row => {
                 if (part.includes(row[2])) {
                     memberList.push(row[1]);
                 }
