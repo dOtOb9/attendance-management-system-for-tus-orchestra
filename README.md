@@ -6,6 +6,6 @@
 | --------------------------- | ---------------------------------------  |
 | normalAttendanceBookID      | SpreadSheetApp's ID                      |
 | tuttiAttendanceBookID       | SpreadSheetApp's ID                      |
-| activityAdministerBookID    | SpreadSheetApp's ID                      |
+| SystemBookID                | SpreadSheetApp's ID                      |
 | userInfoBookID              | SpreadSheetApp's ID                      |
-| AttendanceDiscordBotUrl     | Sends attendance code to Discord channel | 
+| AttendanceDiscordBotURL     | Sends attendance code to Discord channel | 
