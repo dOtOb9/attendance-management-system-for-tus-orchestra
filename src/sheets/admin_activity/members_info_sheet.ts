@@ -11,4 +11,10 @@ class MembersInfoSheet extends MemberSheet {
 
         return MemberRows;
     }
+
+    public getMemberIsPracticeContact(id: string) {
+        const memberRow =  this.searchMember(id);
+
+        return memberRow[9];
+    }
 }

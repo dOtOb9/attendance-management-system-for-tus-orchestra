@@ -1,37 +1,49 @@
 class AttendStatus {
     private readonly id: string;
-    private practice_contact: string;
-    private normal_attend_rate_info: AttendRateInfo;
-    private tutti_attend_rate_info: AttendRateInfo;
+    private practiceContact: string;
+    private normalAttendRateInfo: AttendRateInfo;
+    private tuttiAttendRateInfo: AttendRateInfo;
 
     constructor(id: string) {
         this.id = id;
+        this.practiceContact = new AdminActivityBook().getMembersInfoSheet().getMemberIsPracticeContact(id);
+        this.normalAttendRateInfo = this.getAttendRateStatus(new NormalAttendanceBook());
+        this.tuttiAttendRateInfo = this.getAttendRateStatus(new TuttiAttendanceBook());
     }
 
-    private getAttendRateData(sheet: Sheet): AttendRateData {
-        const rate = sheet.getUserCellValue(this.id, 4);
-        const base = sheet.getUserCellValue(this.id, 2);
-        return { rate, base };
-    }
-
-    private getAttendRateStatus(book: Book): AttendRateInfo {
-        const overture = this.getAttendRateData(book.getSheet('前曲'));
-        const middle = this.getAttendRateData(book.getSheet('中曲'));
-        const main = this.getAttendRateData(book.getSheet('メイン曲'));
+    private getAttendRateStatus(attendanceBook: AttendanceBook): AttendRateInfo {
+        const overture = attendanceBook.getSheet('前曲').getMemberAttendanceRateAndBase(this.id);
+        const middle = attendanceBook.getSheet('中曲').getMemberAttendanceRateAndBase(this.id);
+        const main = attendanceBook.getSheet('メイン曲').getMemberAttendanceRateAndBase(this.id);
+        
         return { overture, middle, main };
     }
 
-    import(bookshelf: Bookshelf){
-        this.practice_contact = bookshelf.user_info_tables.getSheet('ユーザー設定').getUserCellValue(this.id, 8);
-        this.normal_attend_rate_info = this.getAttendRateStatus(bookshelf.normal_attending_tables);
-        this.tutti_attend_rate_info = this.getAttendRateStatus(bookshelf.tutti_attending_tables);
-    }
-
-    discordFormat(): string{
+    public discordFormat(): string{
         return JSON.stringify({
-            'practice_contact': this.practice_contact,
-            'attend_status': `出席率 ... ${this.normal_attend_rate_info}\n母数 ... ${this.normal_attend_rate_info}`,
-            'tutti_attend_status': `出席率 ... ${this.tutti_attend_rate_info}\n母数 ... ${this.tutti_attend_rate_info}`,
+            'practice_contact': this.practiceContact,
+            'attend_status': `
+            - 前曲\n
+            出席率 ... ${this.normalAttendRateInfo.overture.rate}\n
+            母数 ... ${this.normalAttendRateInfo.overture.base}\n\n
+            - 中曲\n
+            出席率 ... ${this.normalAttendRateInfo.middle.rate}\n
+            母数 ... ${this.normalAttendRateInfo.middle.base}\n\n
+            - メイン曲
+            出席率 ... ${this.normalAttendRateInfo.main.rate}\n
+            母数 ... ${this.normalAttendRateInfo.main.base}\n
+            `,
+            'tutti_attend_status': `
+            - 前曲\n
+            出席率 ... ${this.tuttiAttendRateInfo.overture.rate}\n
+            母数 ... ${this.tuttiAttendRateInfo.overture.base}\n\n
+            - 中曲\n
+            出席率 ... ${this.tuttiAttendRateInfo.middle.rate}\n
+            母数 ... ${this.tuttiAttendRateInfo.middle.base}\n\n
+            - メイン曲
+            出席率 ... ${this.tuttiAttendRateInfo.main.rate}\n
+            母数 ... ${this.tuttiAttendRateInfo.main.base}\n
+            `,        
         })
     }
 }

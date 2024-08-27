@@ -1,4 +1,20 @@
 class AttendanceSheet extends MemberSheet {
+    
+    override editMember(memberRow: Array<string>) {
+        const newRowNumber = this.data.length;
+
+        // 練習回数
+        const activityNumber = `=COUNTIF(G${newRowNumber}:${newRowNumber}, "出席")+COUNTIF(G${newRowNumber}:${newRowNumber}, "欠席")+COUNTIF(G${newRowNumber}:${newRowNumber}, "遅刻")+COUNTIF(G${newRowNumber}:${newRowNumber}, "早退")`;
+        // 出席回数
+        const attendanceNumber = `=(COUNTIF(G${newRowNumber}:${newRowNumber}, "出席"))+(COUNTIF(G${newRowNumber}:${newRowNumber}, "遅刻"))*0.5+(COUNTIF(G${newRowNumber}:${newRowNumber}, "早退"))*0.5`;
+        // 出席率
+        const attendanceRate = `=D${newRowNumber}/MAX(C${newRowNumber})`;
+
+        // 出欠表用の行を作成する
+        const attendanceMemberRow = [memberRow[0], memberRow[1], activityNumber, attendanceNumber, attendanceRate, memberRow[2], memberRow[3]];
+
+        super.editMember(attendanceMemberRow);
+    }
 
     public setActivityDate(date: string): number {
         const dateColNumber = this.createColumnsLeft(date, 8, 1);
@@ -20,7 +36,7 @@ class AttendanceSheet extends MemberSheet {
         return false;
     }
 
-    public setAbsense(dateColNumber: number) {
+    public setAbsense(dateColNumber: number): void {
         const values = Array(this.data.length-2).fill(["欠席"]);
         this.setValues(
             2, 
@@ -31,19 +47,12 @@ class AttendanceSheet extends MemberSheet {
         );
     }
 
-    override editMember(memberRow: Array<string>) {
-        const newRowNumber = this.data.length;
+    public getMemberAttendanceRateAndBase(id: string) {
+        const MemberRow = this.searchMember(id);
 
-        // 練習回数
-        const activityNumber = `=COUNTIF(G${newRowNumber}:${newRowNumber}, "出席")+COUNTIF(G${newRowNumber}:${newRowNumber}, "欠席")+COUNTIF(G${newRowNumber}:${newRowNumber}, "遅刻")+COUNTIF(G${newRowNumber}:${newRowNumber}, "早退")`;
-        // 出席回数
-        const attendanceNumber = `=(COUNTIF(G${newRowNumber}:${newRowNumber}, "出席"))+(COUNTIF(G${newRowNumber}:${newRowNumber}, "遅刻"))*0.5+(COUNTIF(G${newRowNumber}:${newRowNumber}, "早退"))*0.5`;
-        // 出席率
-        const attendanceRate = `=D${newRowNumber}/MAX(C${newRowNumber})`;
+        const rate = MemberRow[5];
+        const base = MemberRow[3];
 
-        // 出欠表用の行を作成する
-        const attendanceMemberRow = [memberRow[0], memberRow[1], activityNumber, attendanceNumber, attendanceRate, memberRow[2], memberRow[3]];
-
-        super.editMember(attendanceMemberRow);
-    }
+        return { rate, base };
+    };
 }
