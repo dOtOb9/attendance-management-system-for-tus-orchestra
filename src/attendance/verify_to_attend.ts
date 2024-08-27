@@ -32,7 +32,7 @@ class verifyToAttend {
 
         let attend_flag = false;
         rows.forEach(row => {
-            const sheet = row[2] === 'TRUE' ? this.bookshelf.tutti_attending_tables.getSheet(row[3]) : this.bookshelf.normal_attending_tables.getSheet(row[3]);
+            const sheet = row[1] === 'TRUE' ? this.bookshelf.tutti_attending_tables.getSheet(row[3]) : this.bookshelf.normal_attending_tables.getSheet(row[3]);
 
             const userRow = sheet.reserchUser(this.user.id);
 
