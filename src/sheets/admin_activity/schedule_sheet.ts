@@ -76,9 +76,9 @@ class ScheduleSheet extends Sheet {
     }
 
     public isActivityDate(date: Date): boolean {
-        const todayRows = this.data.filter(row => row[1] === todayRows.toString());
+        const todayRows = this.data.filter(row => row[1] === date.toString());
 
-        return todayRows !== 0;
+        return todayRows.length !== 0;
     }
 
     public prepareActivityDate(date: string, section: string, tutti: string, slots: Array<string>) {

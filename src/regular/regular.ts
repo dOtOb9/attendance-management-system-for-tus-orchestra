@@ -6,10 +6,10 @@ function regular() {
     
     const today = new Today();
 
-    if (scheduleSheet.isActivityDate(today)) return; // もし、今日が練習日出ないなら終了する
+    if (scheduleSheet.isActivityDate(today.date)) return; // もし、今日が練習日でないなら終了する
 
     // 午前0時なら出欠列を生成
-    if (today.getHours() === 0) {
+    if (today.date.getHours() === 0) {
         scheduleSheet.beginActivityDate(today);
     }
 
