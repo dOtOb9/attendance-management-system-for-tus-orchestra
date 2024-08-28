@@ -1,11 +1,13 @@
-# attendance-management-system-for-tus-orchestra
+# Attendance Management System For TUS Orchestra
 # Abstract
 
-## Environmental Variables
+# How To Use
+
+# Environmental Variables
 | Variable Name               | Description                              | 
 | --------------------------- | ---------------------------------------  |
 | normalAttendanceBookID      | SpreadSheetApp's ID                      |
 | tuttiAttendanceBookID       | SpreadSheetApp's ID                      |
 | SystemBookID                | SpreadSheetApp's ID                      |
-| userInfoBookID              | SpreadSheetApp's ID                      |
-| AttendanceDiscordBotURL     | Sends attendance code to Discord channel | 
+| adminActivityBookID         | SpreadSheetApp's ID                      |
+| AttendanceDiscordBotURL     | Sends attendance code to Discord channel |  
