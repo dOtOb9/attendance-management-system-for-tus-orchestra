@@ -19,9 +19,9 @@ class verifyAttendance {
 
         let attendanceFlag = false;
         nowTermRows.forEach(row => {
-            const attendanceSheet = row[1] === 'TRUE' ? new TuttiAttendanceBook().getSheet(row[3]) : new NormalAttendanceBook().getSheet(row[3]);
+            const attendanceSheet = row[2] === 'TRUE' ? new TuttiAttendanceBook().getSheet(row[4]) : new NormalAttendanceBook().getSheet(row[4]);
 
-            attendanceFlag = attendanceSheet.setAttend(this.member.id);
+            attendanceFlag = attendanceSheet.setAttend(this.member.id, Number(row[5]));
         });
 
         if (attendanceFlag) return '出席を確認しました。';

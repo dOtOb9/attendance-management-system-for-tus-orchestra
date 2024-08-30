@@ -22,11 +22,11 @@ class AttendanceSheet extends MemberSheet {
         return dateColNumber;
     }
 
-    public setAttend(id: string): boolean {
+    public setAttend(id: string, datePos: number): boolean {
         const memberRow = this.searchMember(id);
 
         const rowNumber = Number(memberRow[0]);
-        const colNumber = Number(this.data.length - Number(memberRow[5]));
+        const colNumber = Number(this.data[0].length - 1 - datePos);
 
         if (this.data[rowNumber][colNumber] === "欠席") {
             this.setValue(rowNumber, colNumber, "出席");

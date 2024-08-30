@@ -10,9 +10,9 @@ class ScheduleSheet extends Sheet {
 
         const nowTermRows = todayRows.filter(row => {
             if (todayTimeArea === "午前") {
-                return row[2] === "1" || row[2] === "2";
+                return row[3] === "1" || row[3] === "2";
             } else {
-                return row[2] === "3" || row[2] === "4";
+                return row[3] === "3" || row[3] === "4";
             }
         })
 
@@ -75,8 +75,8 @@ class ScheduleSheet extends Sheet {
         }
     }
 
-    public isActivityDate(date: Date): boolean {
-        const todayRows = this.data.filter(row => row[1] === date.toString());
+    public isActivityDate(today: Today): boolean {
+        const todayRows = this.data.filter(row => row[1] === today.toString());
 
         return todayRows.length !== 0;
     }
