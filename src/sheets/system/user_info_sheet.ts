@@ -1,3 +1,0 @@
-class UserInfoSheet extends Sheet {
-    
-}
