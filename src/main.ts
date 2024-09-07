@@ -59,6 +59,26 @@ class AdminActivityBook extends Book {
     }
 }
 
+class AdminEventBook extends Book {
+    readonly adminEventSheet: AdminEventSheet;
+    readonly eventAttendanceSheet: EventAttendanceSheet;
+
+    constructor() {
+        super("adminEventBookID");
+
+        this.adminEventSheet = new AdminEventSheet(this.book.getSheetByName("管理用"));
+        this.eventAttendanceSheet = new EventAttendanceSheet(this.book.getSheetByName("出欠表"));
+    }
+
+    public setEventInfo() {
+        const settingDate = this.adminEventSheet.getSettingDate();
+
+        const EventDateColNumber = this.eventAttendanceSheet.getEventDate(settingDate);
+
+        this.adminEventSheet.setAttendaneSummarize(EventDateColNumber);
+    }
+}
+
 class AttendanceBook extends Book {
 
     
@@ -81,8 +101,6 @@ class TuttiAttendanceBook extends AttendanceBook {
         super("tuttiAttendanceBookID");
     }
 }
-
-
 
   class Sheet {
     private sheet: GoogleAppsScript.Spreadsheet.Sheet;
@@ -132,6 +150,7 @@ class TuttiAttendanceBook extends AttendanceBook {
     }
   }
 
+  
   class MemberSheet extends Sheet {
     public editMember(memberRow: Array<string>): void {
         const userRow = this.searchMember(memberRow[1]);
@@ -141,41 +160,41 @@ class TuttiAttendanceBook extends AttendanceBook {
             return;
         }
     }
-
+    
     private addMember(memberRow: Array<string>) {
         this.appendRow(memberRow);
     }
-
+    
     protected searchMember(id: string) {
         const memberRow = this.data.find((row) => row[2] === id);
-
+        
         return memberRow;
     }
 }
 
 class AttendanceCodeSheet extends Sheet {
     private code: string;
-
+    
     constructor(sheet: GoogleAppsScript.Spreadsheet.Sheet) {
         super(sheet);
         this.code = this.data[2][1];
     }
-
+    
     public isRightCode(code: string): boolean {
         return code === this.code;
     }
-
+    
     public replaceCode(notice=true) {
         this.code = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
         
         this.setValue(2, 1, this.code);
-
+        
         if (notice) this.sendDiscord(this.code);
     }
-
+    
     private sendDiscord(code: string) {
         const today = new Today();
-
+        
         UrlFetchApp.fetch(PropertiesService.getScriptProperties().getProperty('AttendanceDiscordBotURL'), {
             method: 'post',
             contentType: 'application/json',
@@ -197,15 +216,15 @@ class UserInfoSheet extends Sheet {
 }
 
 class ScheduleSheet extends Sheet {
-
+    
     // 現在の練習コマの情報を取得する
     public getNowTermRow(): Array<Array<string>> {
         const today = new Today();
         const todayText = today.toString();
         const todayTimeArea = today.getTimeArea();
-
+        
         const todayRows = this.data.filter(row => row[1] === todayText);
-
+        
         const nowTermRows = todayRows.filter(row => {
             if (todayTimeArea === "午前") {
                 return row[3] === "1" || row[3] === "2";
@@ -213,72 +232,72 @@ class ScheduleSheet extends Sheet {
                 return row[3] === "3" || row[3] === "4";
             }
         })
-
+        
         return nowTermRows;
     }
-
+    
     public setActivityDate(): void {
         // 列名が空白の行だけ取得
         const noneSetDateRows = this.data.filter(row => row[5] === "");
-
+        
         const noneSetNormalDateRows = noneSetDateRows.filter(row => row[2] === "FALSE");
         const noneSetTuttiDateRows = noneSetDateRows.filter(row => row[2] === "TRUE");
-
+        
         // 通常練習、Tutti練習どちらも実行する
         [noneSetNormalDateRows, noneSetTuttiDateRows].forEach((rows: Array<Array<string>>): void => {
             // 追加する列がなければ終了する
             if (rows.length === 0) return;
-
+            
             // Tutti列にチェックが入っているか、入っていないかの判定
             const attendanceBook = rows[0][2] === "TRUE" ? new TuttiAttendanceBook() : new NormalAttendanceBook();
-
+            
             rows.forEach((row) => {
                 // 曲名から対象のシートを取得する
                 const attendanceSheet = attendanceBook.getSheet(row[4]);
-
+                
                 // 日付の出欠列を生成し、生成した列の右端から数えた列数を返す
                 const dateColNumber = attendanceSheet.setActivityDate(row[1]);
-
+                
                 // 生成した列の位置を記録する
                 this.setValue(Number(row[0]), 5, dateColNumber.toString());
             })
         });
     }
-
+    
     public beginActivityDate(today: Today): void {
         const todayRows = this.data.filter(row => row[1] === today.toString());
-
+        
         const todayNormalRows = this.data.filter(row => row[2] === "FALSE");
         const todayTuttiRows = this.data.filter(row => row[2] === "TRUE");
-
+        
         [todayNormalRows, todayTuttiRows].forEach((rows) => {
             // Tutti列にチェックが入っているか、入っていないかの判定
             const attendanceBook = todayRows[0][2] === "TRUE" ? new TuttiAttendanceBook() : new NormalAttendanceBook();
-
+            
             rows.forEach((row) => {
                 // 曲名から対象のシートを取得する
                 const attendanceSheet = attendanceBook.getSheet(row[4]);
-
+                
                 // 列名から対象のコマ列を取得し、各ユーザーに欠席を設定する
                 attendanceSheet.setAbsense(Number(row[5]));
             });
         });
-
+        
         if (todayRows.length !== 0) {
             const systemBook = new SystemBook();
-
+            
             const attendanceCodeSheet = systemBook.getAttendanceCodeSheet();
-
+            
             attendanceCodeSheet.replaceCode();
         }
     }
-
+    
     public isActivityDate(today: Today): boolean {
         const todayRows = this.data.filter(row => row[1] === today.toString());
-
+        
         return todayRows.length !== 0;
     }
-
+    
     public prepareActivityDate(date: string, section: string, tutti: string, slots: Array<string>) {
         for (let i = 0; i < slots.length; ++i) {
             this.appendRow([date, tutti, (i+1).toString(), slots[i], "", section]);
@@ -290,40 +309,40 @@ class AttendanceSheet extends MemberSheet {
     
     override editMember(memberRow: Array<string>) {
         const newRowNumber = this.data.length;
-
+        
         // 練習回数
         const activityNumber = `=COUNTIF(G${newRowNumber}:${newRowNumber}, "出席")+COUNTIF(G${newRowNumber}:${newRowNumber}, "欠席")+COUNTIF(G${newRowNumber}:${newRowNumber}, "遅刻")+COUNTIF(G${newRowNumber}:${newRowNumber}, "早退")`;
         // 出席回数
         const attendanceNumber = `=(COUNTIF(G${newRowNumber}:${newRowNumber}, "出席"))+(COUNTIF(G${newRowNumber}:${newRowNumber}, "遅刻"))*0.5+(COUNTIF(G${newRowNumber}:${newRowNumber}, "早退"))*0.5`;
         // 出席率
         const attendanceRate = `=D${newRowNumber}/MAX(C${newRowNumber})`;
-
+        
         // 出欠表用の行を作成する
         const attendanceMemberRow = [memberRow[0], memberRow[1], activityNumber, attendanceNumber, attendanceRate, memberRow[2], memberRow[3]];
-
+        
         super.editMember(attendanceMemberRow);
     }
-
+    
     public setActivityDate(date: string): number {
         const dateColNumber = this.createColumnsLeft(date, 8, 1);
-
+        
         return dateColNumber;
     }
-
+    
     public setAttend(id: string, datePos: number): boolean {
         const memberRow = this.searchMember(id);
-
+        
         const rowNumber = Number(memberRow[0]);
         const colNumber = Number(this.data[0].length - 1 - datePos);
-
+        
         if (this.data[rowNumber][colNumber] === "欠席") {
             this.setValue(rowNumber, colNumber, "出席");
-
+            
             return true;
         }
         return false;
     }
-
+    
     public setAbsense(dateColNumber: number): void {
         const values = Array(this.data.length-2).fill(["欠席"]);
         this.setValues(
@@ -334,25 +353,47 @@ class AttendanceSheet extends MemberSheet {
             values
         );
     }
-
+    
     public getMemberAttendanceRateAndBase(id: string) {
         const MemberRow = this.searchMember(id);
-
+        
         const rate = MemberRow[5];
         const base = MemberRow[3];
-
+        
         return { rate, base };
     };
 }
 
-class MembersInfoSheet extends MemberSheet {
-
-    public addContactList(id: string) {
-        const userRow = this.searchMember(id);
-
-        this.setValue(Number(userRow[0]), 8, "TRUE");
+class AdminEventSheet extends Sheet {
+    public getSettingDate() {
+        return this.data[4][8];
     }
 
+    public setAttendaneSummarize(dateColNumber: number) {
+        const dateCol = String.fromCharCode(dateColNumber+64);
+
+        this.setValue(5, 8, `=COUNTIF('出欠表'!$${dateCol}2:$${dateCol}, "出席")+COUNTIF('出欠表'!$${dateCol}2:$${dateCol}, "委任状")`);
+        this.setValue(6, 8, `=COUNTIF('出欠表'!$${dateCol}2:$${dateCol}, "出席")`);
+        this.setValue(7, 8, `=COUNTIF('出欠表'!$${dateCol}2:$${dateCol}, "出席")+COUNTIF('出欠表'!$${dateCol}2:$${dateCol}, "早退")`);
+        this.setValue(8, 8, `=COUNTIF('出欠表'!$${dateCol}2:$${dateCol}, "委任状")`);
+        this.setValue(9, 8, `=COUNTIF('出欠表'!$${dateCol}2:$${dateCol}, "欠席")`);
+    }
+}
+
+class EventAttendanceSheet extends Sheet {
+    public getEventDate(date: string): number {
+        return this.data[1].indexOf(date);
+    }
+}
+
+class MembersInfoSheet extends MemberSheet {
+    
+    public addContactList(id: string) {
+        const userRow = this.searchMember(id);
+        
+        this.setValue(Number(userRow[0]), 8, "TRUE");
+    }
+    
     public getContactListRows(): Array<Array<string>> {
         const MemberRows = this.data.filter((row) => row[9] === "TRUE");
 
@@ -548,8 +589,8 @@ function doGet(e) {
             }
 
             contactListRows.forEach(row => {
-                if (part.includes(row[2])) {
-                    memberList.push(row[1]);
+                if (part.includes(row[3])) {
+                    memberList.push(row[2]);
                 }
             });
 
@@ -613,4 +654,13 @@ function regular() {
     const attendanceCodeSheet = systemBook.getAttendanceCodeSheet();
 
     attendanceCodeSheet.replaceCode();
+}
+
+function setEventInfo() {
+    const adminEventBook = new AdminEventBook();
+
+    adminEventBook.setEventInfo();
+}
+
+function startEventFlow() {
 }
