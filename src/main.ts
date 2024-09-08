@@ -553,6 +553,12 @@ function doGet(e) {
         case 'dashboard':
             return HtmlService.createHtmlOutputFromFile('src/views/dashboard');
 
+        case 'settingMeetingForm':
+            const htmlTemplate = HtmlService.createTemplateFromFile('src/views/setting-meeting-form');
+
+            htmlTemplate.cssContent = HtmlService.createHtmlOutputFromFile('src/views/setting-meeting-form-css').getContent();
+            return htmlTemplate.evaluate();
+
         case 'user_data':
             const user = new Member(e.parameter.id);
             response_text = user.attend_status.discordFormat();
@@ -663,4 +669,10 @@ function setEventInfo() {
 }
 
 function startEventFlow() {
+    const ui = SpreadsheetApp.getUi();
+
+    const htmlOutput = HtmlService
+        .createHtmlOutput(`<a href="${PropertiesService.getScriptProperties().getProperty("doGetUrl")}?mode=dashboard">ここをクリック</a>`);
+
+    ui.showModelessDialog(htmlOutput, "リンクからアクセス");
 }
