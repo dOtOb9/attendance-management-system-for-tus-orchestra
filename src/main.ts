@@ -551,7 +551,10 @@ function doGet(e) {
 
     switch (mode) {
         case 'dashboard':
-            return HtmlService.createHtmlOutputFromFile('src/views/dashboard');
+            const dashboardHtml = HtmlService.createTemplateFromFile('src/views/dashboard');
+
+            dashboardHtml.cssContent = HtmlService.createHtmlOutputFromFile('src/views/dashboard-css').getContent();
+            return dashboardHtml.evaluate();
 
         case 'settingMeetingForm':
             const htmlTemplate = HtmlService.createTemplateFromFile('src/views/setting-meeting-form');
