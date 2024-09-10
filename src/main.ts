@@ -298,7 +298,7 @@ class ScheduleSheet extends Sheet {
         return todayRows.length !== 0;
     }
     
-    public prepareActivityDate(date: string, section: string, tutti: string, slots: Array<string>) {
+    public prepareActivityDate(date: string, section: string, tutti: string, slots: Array<string>): void {
         for (let i = 0; i < slots.length; ++i) {
             this.appendRow([date, tutti, (i+1).toString(), slots[i], "", section]);
         }
@@ -407,8 +407,68 @@ class MembersInfoSheet extends MemberSheet {
     }
 }
 
+interface AttendRateInfo{
+    overture: AttendRateData;
+    middle: AttendRateData;
+    main: AttendRateData;
+}
+
+interface AttendRateData {
+    rate: string;
+    base: string;
+}
+
+class AttendanceStatus {
+    private readonly id: string;
+    private normalAttendRateInfo: AttendRateInfo;
+    private tuttiAttendRateInfo: AttendRateInfo;
+    
+    constructor(id: string) {
+        this.id = id;
+        this.normalAttendRateInfo = this.getAttendRateStatus(new NormalAttendanceBook());
+        this.tuttiAttendRateInfo = this.getAttendRateStatus(new TuttiAttendanceBook());
+    }
+    
+    public getAttendRateStatus(attendanceBook: AttendanceBook): AttendRateInfo {
+        const overture = attendanceBook.getSheet('前曲').getMemberAttendanceRateAndBase(this.id);
+        const middle = attendanceBook.getSheet('中曲').getMemberAttendanceRateAndBase(this.id);
+        const main = attendanceBook.getSheet('メイン曲').getMemberAttendanceRateAndBase(this.id);
+        
+        return { overture, middle, main };
+    }
+    
+    public discordFormat(): string{
+        return JSON.stringify({
+            'attend_status': `
+            - 前曲\n
+            出席率 ... ${this.normalAttendRateInfo.overture.rate}\n
+            母数 ... ${this.normalAttendRateInfo.overture.base}\n\n
+            - 中曲\n
+            出席率 ... ${this.normalAttendRateInfo.middle.rate}\n
+            母数 ... ${this.normalAttendRateInfo.middle.base}\n\n
+            - メイン曲
+            出席率 ... ${this.normalAttendRateInfo.main.rate}\n
+            母数 ... ${this.normalAttendRateInfo.main.base}\n
+            `,
+            'tutti_attend_status': `
+            - 前曲\n
+            出席率 ... ${this.tuttiAttendRateInfo.overture.rate}\n
+            母数 ... ${this.tuttiAttendRateInfo.overture.base}\n\n
+            - 中曲\n
+            出席率 ... ${this.tuttiAttendRateInfo.middle.rate}\n
+            母数 ... ${this.tuttiAttendRateInfo.middle.base}\n\n
+            - メイン曲
+            出席率 ... ${this.tuttiAttendRateInfo.main.rate}\n
+            母数 ... ${this.tuttiAttendRateInfo.main.base}\n
+            `,        
+        })
+    }
+}
+
+
+
 class Member {
-    attend_status: AttendStatus;
+    attendanceStatus: AttendanceStatus;
     readonly id: string;
     readonly name: string;
     readonly part: string;
@@ -419,6 +479,7 @@ class Member {
         this.name = name;
         this.part = part;
         this.grade = grade;
+        this.attendanceStatus = new AttendanceStatus(id);
     }
 
     public addContactList() {
@@ -481,69 +542,6 @@ class verifyAttendance {
     }
 }
 
-
-
-interface AttendRateInfo{
-    overture: AttendRateData;
-    middle: AttendRateData;
-    main: AttendRateData;
-}
-
-interface AttendRateData {
-    rate: string;
-    base: string;
-}
-
-class AttendStatus {
-    private readonly id: string;
-    private practiceContact: string;
-    private normalAttendRateInfo: AttendRateInfo;
-    private tuttiAttendRateInfo: AttendRateInfo;
-
-    constructor(id: string) {
-        this.id = id;
-        this.practiceContact = new AdminActivityBook().getMembersInfoSheet().getMemberIsPracticeContact(id);
-        this.normalAttendRateInfo = this.getAttendRateStatus(new NormalAttendanceBook());
-        this.tuttiAttendRateInfo = this.getAttendRateStatus(new TuttiAttendanceBook());
-    }
-
-    private getAttendRateStatus(attendanceBook: AttendanceBook): AttendRateInfo {
-        const overture = attendanceBook.getSheet('前曲').getMemberAttendanceRateAndBase(this.id);
-        const middle = attendanceBook.getSheet('中曲').getMemberAttendanceRateAndBase(this.id);
-        const main = attendanceBook.getSheet('メイン曲').getMemberAttendanceRateAndBase(this.id);
-        
-        return { overture, middle, main };
-    }
-
-    public discordFormat(): string{
-        return JSON.stringify({
-            'practice_contact': this.practiceContact,
-            'attend_status': `
-            - 前曲\n
-            出席率 ... ${this.normalAttendRateInfo.overture.rate}\n
-            母数 ... ${this.normalAttendRateInfo.overture.base}\n\n
-            - 中曲\n
-            出席率 ... ${this.normalAttendRateInfo.middle.rate}\n
-            母数 ... ${this.normalAttendRateInfo.middle.base}\n\n
-            - メイン曲
-            出席率 ... ${this.normalAttendRateInfo.main.rate}\n
-            母数 ... ${this.normalAttendRateInfo.main.base}\n
-            `,
-            'tutti_attend_status': `
-            - 前曲\n
-            出席率 ... ${this.tuttiAttendRateInfo.overture.rate}\n
-            母数 ... ${this.tuttiAttendRateInfo.overture.base}\n\n
-            - 中曲\n
-            出席率 ... ${this.tuttiAttendRateInfo.middle.rate}\n
-            母数 ... ${this.tuttiAttendRateInfo.middle.base}\n\n
-            - メイン曲
-            出席率 ... ${this.tuttiAttendRateInfo.main.rate}\n
-            母数 ... ${this.tuttiAttendRateInfo.main.base}\n
-            `,        
-        })
-    }
-}
-
 function doGet(e) {
     const mode = e.parameter.mode;
 
@@ -551,10 +549,28 @@ function doGet(e) {
 
     switch (mode) {
         case 'dashboard':
+            const normalAttendanceBook = new NormalAttendanceBook();
+            const tuttiAttendanceBook = new TuttiAttendanceBook();
+
+
+            const member = new Member(e.parameter.id);
+
+            const normalAttendRateStatus = member.attendanceStatus.getAttendRateStatus(normalAttendanceBook);
+            const tuttiAttendRateStatus = member.attendanceStatus.getAttendRateStatus(tuttiAttendanceBook);
+            
             const dashboardHtml = HtmlService.createTemplateFromFile('src/views/dashboard');
 
+            dashboardHtml.attendanceNormalOverture = normalAttendRateStatus.overture.rate;
+            dashboardHtml.attendanceNormalMiddle = normalAttendRateStatus.middle.rate;
+            dashboardHtml.attendanceNormalMain = normalAttendRateStatus.main.rate;
+
+            dashboardHtml.attendanceTuttiOverture = tuttiAttendRateStatus.overture.rate;
+            dashboardHtml.attendanceTuttiMiddle = tuttiAttendRateStatus.middle.rate;
+            dashboardHtml.attendanceTuttiMain = tuttiAttendRateStatus.main.rate;
+
             dashboardHtml.cssContent = HtmlService.createHtmlOutputFromFile('src/views/dashboard-css').getContent();
-            return dashboardHtml.evaluate();
+            const dashboardHtmlOutput = dashboardHtml.evaluate();
+            return dashboardHtmlOutput;
 
         case 'settingMeetingForm':
             const htmlTemplate = HtmlService.createTemplateFromFile('src/views/setting-meeting-form');
@@ -564,7 +580,7 @@ function doGet(e) {
 
         case 'user_data':
             const user = new Member(e.parameter.id);
-            response_text = user.attend_status.discordFormat();
+            response_text = user.attendanceStatus.discordFormat();
             return ContentService.createTextOutput(response_text);
 
         case 'can_send_activity_dm':

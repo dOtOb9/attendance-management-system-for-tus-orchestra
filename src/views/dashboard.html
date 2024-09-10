@@ -7,31 +7,12 @@
     </style>
   <head>
   <body>
-    <div class="absolute left-0 top-0 h-screen w-screen bg-orange-50 p-0.5">
-      <div class="bg-white shadow-2xl p-10 m-20 mx-auto">
+    <div class="absolute left-0 top-0 min-h-screen w-screen bg-orange-50 p-0.5">
+      <div class="bg-white shadow-2xl p-10 m-20">
         <div class="border-b-4">
           <h1 class="text-3xl font-sans font-bold text-orange-500 p-10">
             出席状況確認
           </h1>
-        </div>
-        <div>
-          <p class="text-xl border-b-2 p-4">
-            今日の出欠状況
-          </p>
-          <div class="justify-center p-4 space-x-5 flex">
-            <p class="text-center text-lg p-3 bg-gray-100 rounded-md flex-1 shadow-md">
-              出席
-            </p>
-            <p class="text-center text-lg p-3 bg-gray-100 rounded-md flex-1 shadow-md">
-              出席
-            </p>
-            <p class="text-center text-lg p-3 bg-gray-100 rounded-md flex-1 shadow-md">
-              出席
-            </p>
-            <p class="text-center text-lg p-3 bg-gray-100 rounded-md flex-1 shadow-md">
-              出席
-            </p>
-          </div>
         </div>
         <div>
           <p class="text-xl border-b-2 p-4">
@@ -40,15 +21,15 @@
           <div class="justify-center p-4 space-x-5 flex">
             <div class="flex-1 shadow-md rounded-md bg-gray-100">
               <p class="text-center text-lg border-b-2 p-3">前曲</p>
-              <p class="text-center text-lg p-3">10%</p>
+              <p class="text-center text-lg p-3"><?=attendanceNormalOverture?></p>
             </div>
             <div class="flex-1 shadow-md rounded-md bg-gray-100">
               <p class="text-center text-lg border-b-2 p-3">中曲</p>
-              <p class="text-center text-lg p-3">20%</p>
+              <p class="text-center text-lg p-3"><?=attendanceNormalMiddle?></p>
             </div>
             <div class="flex-1 shadow-md rounded-md bg-gray-100">
               <p class="text-center text-lg border-b-2 p-3">メイン曲</p>
-              <p class="text-center text-lg p-3">30%</p>
+              <p class="text-center text-lg p-3"><?=attendanceNormalMain?></p>
             </div>
           </div>
         </div>
@@ -59,15 +40,15 @@
           <div class="justify-center p-4 space-x-5 flex">
             <div class="flex-1 shadow-md rounded-md bg-gray-100">
               <p class="text-center text-lg border-b-2 p-3">前曲</p>
-              <p class="text-center text-lg p-3">10%</p>
+              <p class="text-center text-lg p-3"><?=attendanceTuttiOverture?></p>
             </div>
             <div class="flex-1 shadow-md rounded-md bg-gray-100">
               <p class="text-center text-lg border-b-2 p-3">中曲</p>
-              <p class="text-center text-lg p-3">20%</p>
+              <p class="text-center text-lg p-3"><?=attendanceTuttiMiddle?></p>
             </div>
             <div class="flex-1 shadow-md rounded-md bg-gray-100">
               <p class="text-center text-lg border-b-2 p-3">メイン曲</p>
-              <p class="text-center text-lg p-3">30%</p>
+              <p class="text-center text-lg p-3"><?=attendanceTuttiMain?></p>
             </div>
           </div>
         </div>
