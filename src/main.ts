@@ -379,7 +379,7 @@ class AdminEventSheet extends Sheet {
     }
 }
 
-class EventAttendanceSheet extends Sheet {
+class EventAttendanceSheet extends AttendanceSheet {
     public getEventDate(date: string): number {
         return this.data[1].indexOf(date);
     }
