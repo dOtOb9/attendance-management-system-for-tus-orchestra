@@ -102,74 +102,73 @@ class TuttiAttendanceBook extends AttendanceBook {
     }
 }
 
-  class Sheet {
-    private sheet: GoogleAppsScript.Spreadsheet.Sheet;
-    protected data: string[][];
+class Sheet {
+  private sheet: GoogleAppsScript.Spreadsheet.Sheet;
+  protected data: string[][];
+
+  constructor(sheet: GoogleAppsScript.Spreadsheet.Sheet) {
+    this.sheet = sheet;
+
+    // 入力されている右端のセルを取得
+    const last_row = sheet.getLastRow();
+    const last_col = sheet.getLastColumn();
+
+    // 入力されているデータ全体を取得
+    this.data = sheet.getRange(1, 1, last_row, last_col).getDisplayValues();
+
+    // ==================================================================================
+    const addRowNumbers = (matrix: string[][]): string[][] => {
+      return matrix.map((row, index) => [(index + 1).toString(), ...row]);
+    };
+
+    const addColumnNumbers = (matrix: string[][]): string[][] => {
+      const columnNumbers = Array.from({ length: matrix[0].length + 1 }, (_, index) => index.toString());
+      return [columnNumbers, ...matrix];
+    };
+    // ==================================================================================
+
+    this.data = addRowNumbers(this.data);
+    this.data = addColumnNumbers(this.data);
+  }
   
-    constructor(sheet: GoogleAppsScript.Spreadsheet.Sheet) {
-      this.sheet = sheet;
-  
-      // 入力されている右端のセルを取得
-      const last_row = sheet.getLastRow();
-      const last_col = sheet.getLastColumn();
-  
-      // 入力されているデータ全体を取得
-      this.data = sheet.getRange(1, 1, last_row, last_col).getDisplayValues();
-  
-      // ==================================================================================
-      const addRowNumbers = (matrix: string[][]): string[][] => {
-        return matrix.map((row, index) => [(index + 1).toString(), ...row]);
-      };
-  
-      const addColumnNumbers = (matrix: string[][]): string[][] => {
-        const columnNumbers = Array.from({ length: matrix[0].length + 1 }, (_, index) => index.toString());
-        return [columnNumbers, ...matrix];
-      };
-      // ==================================================================================
-  
-      this.data = addRowNumbers(this.data);
-      this.data = addColumnNumbers(this.data);
-    }
-    
-    protected createColumnsLeft(value: string, col: number, rows: number): number {
-      this.sheet.insertColumnsBefore(col, rows);
-      this.sheet.getRange(1, col).setValue(value);
-      return this.data[0].length - col;
-    }
-  
-    protected setValue(row: number, col: number, value: string): void {
-      this.sheet.getRange(row, col).setValue(value);
-    }
-  
-    protected setValues(startRow: number, startCol: number, NumRows: number, NumCols: number, values: Array<Array<string>>): void {
-      this.sheet.getRange(startRow, startCol, NumRows, NumCols).setValues(values);
-    }
-  
-    protected appendRow(row: Array<string>): void {
-      this.sheet.appendRow(row);
-    }
+  protected createColumnsLeft(value: string, col: number, rows: number): number {
+    this.sheet.insertColumnsBefore(col, rows);
+    this.sheet.getRange(1, col).setValue(value);
+    return this.data[0].length - col;
   }
 
-  
-  class MemberSheet extends Sheet {
-    public editMember(memberRow: Array<string>): void {
-        const userRow = this.searchMember(memberRow[1]);
+  protected setValue(row: number, col: number, value: string): void {
+    this.sheet.getRange(row, col).setValue(value);
+  }
 
-        if (userRow === undefined) {
-            this.addMember(memberRow);
-            return;
-        }
-    }
-    
-    private addMember(memberRow: Array<string>) {
-        this.appendRow(memberRow);
-    }
-    
-    protected searchMember(id: string) {
-        const memberRow = this.data.find((row) => row[2] === id);
-        
-        return memberRow;
-    }
+  protected setValues(startRow: number, startCol: number, NumRows: number, NumCols: number, values: Array<Array<string>>): void {
+    this.sheet.getRange(startRow, startCol, NumRows, NumCols).setValues(values);
+  }
+
+  protected appendRow(row: Array<string>): void {
+    this.sheet.appendRow(row);
+  }
+}
+  
+class MemberSheet extends Sheet {
+  public editMember(memberRow: Array<string>): void {
+      const userRow = this.searchMember(memberRow[1]);
+
+      if (userRow === undefined) {
+          this.addMember(memberRow);
+          return;
+      }
+  }
+  
+  private addMember(memberRow: Array<string>) {
+      this.appendRow(memberRow);
+  }
+  
+  protected searchMember(id: string) {
+      const memberRow = this.data.find((row) => row[2] === id);
+      
+      return memberRow;
+  }
 }
 
 class AttendanceCodeSheet extends Sheet {
@@ -266,30 +265,20 @@ class ScheduleSheet extends Sheet {
     
     public beginActivityDate(today: Today): void {
         const todayRows = this.data.filter(row => row[1] === today.toString());
+
+        const tuttiAttendanceBook = new TuttiAttendanceBook();
+        const normalAttendanceBook = new NormalAttendanceBook();
         
-        const todayNormalRows = this.data.filter(row => row[2] === "FALSE");
-        const todayTuttiRows = this.data.filter(row => row[2] === "TRUE");
-        
-        [todayNormalRows, todayTuttiRows].forEach((rows) => {
+        todayRows.forEach((row) => {
             // Tutti列にチェックが入っているか、入っていないかの判定
-            const attendanceBook = todayRows[0][2] === "TRUE" ? new TuttiAttendanceBook() : new NormalAttendanceBook();
+            const attendanceBook = row[2] === "TRUE" ? tuttiAttendanceBook : normalAttendanceBook;
             
-            rows.forEach((row) => {
-                // 曲名から対象のシートを取得する
-                const attendanceSheet = attendanceBook.getSheet(row[4]);
-                
-                // 列名から対象のコマ列を取得し、各ユーザーに欠席を設定する
-                attendanceSheet.setAbsense(Number(row[5]));
-            });
+            // 曲名から対象のシートを取得する
+            const attendanceSheet = attendanceBook.getSheet(row[4]);
+            
+            // 列名から対象のコマ列を取得し、各ユーザーに欠席を設定する
+            attendanceSheet.setAbsense(Number(row[5]));
         });
-        
-        if (todayRows.length !== 0) {
-            const systemBook = new SystemBook();
-            
-            const attendanceCodeSheet = systemBook.getAttendanceCodeSheet();
-            
-            attendanceCodeSheet.replaceCode();
-        }
     }
     
     public isActivityDate(today: Today): boolean {
@@ -298,7 +287,7 @@ class ScheduleSheet extends Sheet {
         return todayRows.length !== 0;
     }
     
-    public prepareActivityDate(date: string, section: string, tutti: string, slots: Array<string>) {
+    public prepareActivityDate(date: string, section: string, tutti: string, slots: Array<string>): void {
         for (let i = 0; i < slots.length; ++i) {
             this.appendRow([date, tutti, (i+1).toString(), slots[i], "", section]);
         }
@@ -380,7 +369,7 @@ class AdminEventSheet extends Sheet {
     }
 }
 
-class EventAttendanceSheet extends Sheet {
+class EventAttendanceSheet extends AttendanceSheet {
     public getEventDate(date: string): number {
         return this.data[1].indexOf(date);
     }
@@ -407,8 +396,68 @@ class MembersInfoSheet extends MemberSheet {
     }
 }
 
+interface AttendRateInfo{
+    overture: AttendRateData;
+    middle: AttendRateData;
+    main: AttendRateData;
+}
+
+interface AttendRateData {
+    rate: string;
+    base: string;
+}
+
+class AttendanceStatus {
+    private readonly id: string;
+    private normalAttendRateInfo: AttendRateInfo;
+    private tuttiAttendRateInfo: AttendRateInfo;
+    
+    constructor(id: string) {
+        this.id = id;
+        this.normalAttendRateInfo = this.getAttendRateStatus(new NormalAttendanceBook());
+        this.tuttiAttendRateInfo = this.getAttendRateStatus(new TuttiAttendanceBook());
+    }
+    
+    public getAttendRateStatus(attendanceBook: AttendanceBook): AttendRateInfo {
+        const overture = attendanceBook.getSheet('前曲').getMemberAttendanceRateAndBase(this.id);
+        const middle = attendanceBook.getSheet('中曲').getMemberAttendanceRateAndBase(this.id);
+        const main = attendanceBook.getSheet('メイン曲').getMemberAttendanceRateAndBase(this.id);
+        
+        return { overture, middle, main };
+    }
+    
+    public discordFormat(): string{
+        return JSON.stringify({
+            'attend_status': `
+            - 前曲\n
+            出席率 ... ${this.normalAttendRateInfo.overture.rate}\n
+            母数 ... ${this.normalAttendRateInfo.overture.base}\n\n
+            - 中曲\n
+            出席率 ... ${this.normalAttendRateInfo.middle.rate}\n
+            母数 ... ${this.normalAttendRateInfo.middle.base}\n\n
+            - メイン曲
+            出席率 ... ${this.normalAttendRateInfo.main.rate}\n
+            母数 ... ${this.normalAttendRateInfo.main.base}\n
+            `,
+            'tutti_attend_status': `
+            - 前曲\n
+            出席率 ... ${this.tuttiAttendRateInfo.overture.rate}\n
+            母数 ... ${this.tuttiAttendRateInfo.overture.base}\n\n
+            - 中曲\n
+            出席率 ... ${this.tuttiAttendRateInfo.middle.rate}\n
+            母数 ... ${this.tuttiAttendRateInfo.middle.base}\n\n
+            - メイン曲
+            出席率 ... ${this.tuttiAttendRateInfo.main.rate}\n
+            母数 ... ${this.tuttiAttendRateInfo.main.base}\n
+            `,        
+        })
+    }
+}
+
+
+
 class Member {
-    attend_status: AttendStatus;
+    attendanceStatus: AttendanceStatus;
     readonly id: string;
     readonly name: string;
     readonly part: string;
@@ -419,6 +468,7 @@ class Member {
         this.name = name;
         this.part = part;
         this.grade = grade;
+        this.attendanceStatus = new AttendanceStatus(id);
     }
 
     public addContactList() {
@@ -481,69 +531,6 @@ class verifyAttendance {
     }
 }
 
-
-
-interface AttendRateInfo{
-    overture: AttendRateData;
-    middle: AttendRateData;
-    main: AttendRateData;
-}
-
-interface AttendRateData {
-    rate: string;
-    base: string;
-}
-
-class AttendStatus {
-    private readonly id: string;
-    private practiceContact: string;
-    private normalAttendRateInfo: AttendRateInfo;
-    private tuttiAttendRateInfo: AttendRateInfo;
-
-    constructor(id: string) {
-        this.id = id;
-        this.practiceContact = new AdminActivityBook().getMembersInfoSheet().getMemberIsPracticeContact(id);
-        this.normalAttendRateInfo = this.getAttendRateStatus(new NormalAttendanceBook());
-        this.tuttiAttendRateInfo = this.getAttendRateStatus(new TuttiAttendanceBook());
-    }
-
-    private getAttendRateStatus(attendanceBook: AttendanceBook): AttendRateInfo {
-        const overture = attendanceBook.getSheet('前曲').getMemberAttendanceRateAndBase(this.id);
-        const middle = attendanceBook.getSheet('中曲').getMemberAttendanceRateAndBase(this.id);
-        const main = attendanceBook.getSheet('メイン曲').getMemberAttendanceRateAndBase(this.id);
-        
-        return { overture, middle, main };
-    }
-
-    public discordFormat(): string{
-        return JSON.stringify({
-            'practice_contact': this.practiceContact,
-            'attend_status': `
-            - 前曲\n
-            出席率 ... ${this.normalAttendRateInfo.overture.rate}\n
-            母数 ... ${this.normalAttendRateInfo.overture.base}\n\n
-            - 中曲\n
-            出席率 ... ${this.normalAttendRateInfo.middle.rate}\n
-            母数 ... ${this.normalAttendRateInfo.middle.base}\n\n
-            - メイン曲
-            出席率 ... ${this.normalAttendRateInfo.main.rate}\n
-            母数 ... ${this.normalAttendRateInfo.main.base}\n
-            `,
-            'tutti_attend_status': `
-            - 前曲\n
-            出席率 ... ${this.tuttiAttendRateInfo.overture.rate}\n
-            母数 ... ${this.tuttiAttendRateInfo.overture.base}\n\n
-            - 中曲\n
-            出席率 ... ${this.tuttiAttendRateInfo.middle.rate}\n
-            母数 ... ${this.tuttiAttendRateInfo.middle.base}\n\n
-            - メイン曲
-            出席率 ... ${this.tuttiAttendRateInfo.main.rate}\n
-            母数 ... ${this.tuttiAttendRateInfo.main.base}\n
-            `,        
-        })
-    }
-}
-
 function doGet(e) {
     const mode = e.parameter.mode;
 
@@ -551,11 +538,38 @@ function doGet(e) {
 
     switch (mode) {
         case 'dashboard':
-            return HtmlService.createHtmlOutputFromFile('src/views/dashboard');
+            const normalAttendanceBook = new NormalAttendanceBook();
+            const tuttiAttendanceBook = new TuttiAttendanceBook();
+
+
+            const member = new Member(e.parameter.id);
+
+            const normalAttendRateStatus = member.attendanceStatus.getAttendRateStatus(normalAttendanceBook);
+            const tuttiAttendRateStatus = member.attendanceStatus.getAttendRateStatus(tuttiAttendanceBook);
+            
+            const dashboardHtml = HtmlService.createTemplateFromFile('src/views/dashboard');
+
+            dashboardHtml.attendanceNormalOverture = normalAttendRateStatus.overture.rate;
+            dashboardHtml.attendanceNormalMiddle = normalAttendRateStatus.middle.rate;
+            dashboardHtml.attendanceNormalMain = normalAttendRateStatus.main.rate;
+
+            dashboardHtml.attendanceTuttiOverture = tuttiAttendRateStatus.overture.rate;
+            dashboardHtml.attendanceTuttiMiddle = tuttiAttendRateStatus.middle.rate;
+            dashboardHtml.attendanceTuttiMain = tuttiAttendRateStatus.main.rate;
+
+            dashboardHtml.cssContent = HtmlService.createHtmlOutputFromFile('src/views/dashboard-css').getContent();
+            const dashboardHtmlOutput = dashboardHtml.evaluate();
+            return dashboardHtmlOutput;
+
+        case 'settingMeetingForm':
+            const htmlTemplate = HtmlService.createTemplateFromFile('src/views/setting-meeting-form');
+
+            htmlTemplate.cssContent = HtmlService.createHtmlOutputFromFile('src/views/setting-meeting-form-css').getContent();
+            return htmlTemplate.evaluate();
 
         case 'user_data':
             const user = new Member(e.parameter.id);
-            response_text = user.attend_status.discordFormat();
+            response_text = user.attendanceStatus.discordFormat();
             return ContentService.createTextOutput(response_text);
 
         case 'can_send_activity_dm':
@@ -663,4 +677,10 @@ function setEventInfo() {
 }
 
 function startEventFlow() {
+    const ui = SpreadsheetApp.getUi();
+
+    const htmlOutput = HtmlService
+        .createHtmlOutput(`<a href="${PropertiesService.getScriptProperties().getProperty("doGetUrl")}?mode=dashboard">ここをクリック</a>`);
+
+    ui.showModelessDialog(htmlOutput, "リンクからアクセス");
 }
