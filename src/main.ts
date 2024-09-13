@@ -265,30 +265,20 @@ class ScheduleSheet extends Sheet {
     
     public beginActivityDate(today: Today): void {
         const todayRows = this.data.filter(row => row[1] === today.toString());
+
+        const tuttiAttendanceBook = new TuttiAttendanceBook();
+        const normalAttendanceBook = new NormalAttendanceBook();
         
-        const todayNormalRows = this.data.filter(row => row[2] === "FALSE");
-        const todayTuttiRows = this.data.filter(row => row[2] === "TRUE");
-        
-        [todayNormalRows, todayTuttiRows].forEach((rows) => {
+        todayRows.forEach((row) => {
             // Tutti列にチェックが入っているか、入っていないかの判定
-            const attendanceBook = todayRows[0][2] === "TRUE" ? new TuttiAttendanceBook() : new NormalAttendanceBook();
+            const attendanceBook = row[2] === "TRUE" ? tuttiAttendanceBook : normalAttendanceBook;
             
-            rows.forEach((row) => {
-                // 曲名から対象のシートを取得する
-                const attendanceSheet = attendanceBook.getSheet(row[4]);
-                
-                // 列名から対象のコマ列を取得し、各ユーザーに欠席を設定する
-                attendanceSheet.setAbsense(Number(row[5]));
-            });
+            // 曲名から対象のシートを取得する
+            const attendanceSheet = attendanceBook.getSheet(row[4]);
+            
+            // 列名から対象のコマ列を取得し、各ユーザーに欠席を設定する
+            attendanceSheet.setAbsense(Number(row[5]));
         });
-        
-        if (todayRows.length !== 0) {
-            const systemBook = new SystemBook();
-            
-            const attendanceCodeSheet = systemBook.getAttendanceCodeSheet();
-            
-            attendanceCodeSheet.replaceCode();
-        }
     }
     
     public isActivityDate(today: Today): boolean {
