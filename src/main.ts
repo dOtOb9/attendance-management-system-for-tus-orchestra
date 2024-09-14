@@ -34,7 +34,6 @@ class Today {
     public getTimeArea(): string {
         return this.date.getHours() < 12 ? '午前' : '午後';
     }
-
 }
 
 class Book {
@@ -44,7 +43,7 @@ class Book {
         this.book = SpreadsheetApp.openById(new Property().getProperty(type));
     }
 
-    public getSheet(sheetName: string) {
+    protected getSheetByName(sheetName: string) {
         const sheet = this.book.getSheetByName(sheetName);
 
         // シートが存在しない場合はエラーを返す
@@ -61,13 +60,13 @@ class SystemBook extends Book {
     }
 
     public getAttendanceCodeSheet() {
-        const sheet = this.getSheet("認証コード");
+        const sheet = this.getSheetByName("認証コード");
 
         return new AttendanceCodeSheet(sheet);
     }
 
     public getUserInfoSheet() {
-        const sheet = this.getSheet("ユーザー情報");
+        const sheet = this.getSheetByName("ユーザー情報");
 
         return new UserInfoSheet(sheet);
     }
@@ -79,13 +78,13 @@ class AdminActivityBook extends Book {
     }
 
     public getScheduleSheet() {
-        const sheet = this.getSheet("練習予定");
+        const sheet = this.getSheetByName("練習予定");
         
         return new ScheduleSheet(sheet);
     }
 
     public getMembersInfoSheet() {
-        const sheet = this.getSheet("乗り番");
+        const sheet = this.getSheetByName("乗り番");
 
         return new MembersInfoSheet(sheet);
     }
@@ -98,8 +97,8 @@ class AdminEventBook extends Book {
     constructor() {
         super("adminEventBookID");
 
-        this.adminEventSheet = new AdminEventSheet(this.getSheet("管理用"));
-        this.eventAttendanceSheet = new EventAttendanceSheet(this.getSheet("出欠表"));
+        this.adminEventSheet = new AdminEventSheet(this.getSheetByName("管理用"));
+        this.eventAttendanceSheet = new EventAttendanceSheet(this.getSheetByName("出欠表"));
     }
 
     public setEventInfo() {
@@ -112,10 +111,9 @@ class AdminEventBook extends Book {
 }
 
 class AttendanceBook extends Book {
-
     
     public getSheet(sheetName: string) {
-        const sheet = this.getSheet(sheetName);
+        const sheet = super.getSheetByName(sheetName);
         return new AttendanceSheet(sheet);
     }
 }
