@@ -1,18 +1,15 @@
 {
-  "dependencies": {
-    "punycode": "^2.3.1"
-  },
   "name": "attendance-management-system-for-tus-orchestra",
-  "description": "スプレッドシートを用いた東京理科大学管弦楽団の出欠管理システム",
   "version": "1.0.0",
+  "description": "The TUS Orchestra is a student orchestra from the Tokyo University of Science. We usually practice in four sessions from 10 AM to 4:30 PM. The system divides these four sessions into two parts: two sessions in the first half and two in the second half. Attendance is managed by having each member send an authentication code. You can check the system details here (in Japanese).",
   "main": "index.js",
-  "devDependencies": {
-    "@types/google-apps-script": "^1.0.83"
-  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "@types/google-apps-script": "^1.0.83"
+  }
 }

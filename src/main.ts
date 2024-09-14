@@ -1,3 +1,25 @@
+class Property {
+    private readonly property: GoogleAppsScript.Properties.Properties;
+
+    constructor() {
+        this.property = PropertiesService.getScriptProperties();
+    }
+
+    public setProperty(key: string, value: string): void {
+        this.property.setProperty(key, value);
+    }
+
+    public getProperty(key: string) {
+        const propertyValue =  this.property.getProperty(key);
+
+        if (propertyValue === null) {
+            throw new Error(`Property for key ${key} is not set.`);
+        }
+        return propertyValue;
+    }
+}
+
+
 class Today {
     public date: Date
 
@@ -16,10 +38,20 @@ class Today {
 }
 
 class Book {
-    protected book: GoogleAppsScript.Spreadsheet.Spreadsheet;
+    private book: GoogleAppsScript.Spreadsheet.Spreadsheet;
     
     constructor(type: string) {
-        this.book = SpreadsheetApp.openById(PropertiesService.getScriptProperties().getProperty(type));
+        this.book = SpreadsheetApp.openById(new Property().getProperty(type));
+    }
+
+    public getSheet(sheetName: string) {
+        const sheet = this.book.getSheetByName(sheetName);
+
+        // シートが存在しない場合はエラーを返す
+        if (sheet === null) {
+            throw new Error(`Sheet ${sheetName} is not found.`);
+        }
+        return sheet;
     }
 }
 
@@ -29,13 +61,13 @@ class SystemBook extends Book {
     }
 
     public getAttendanceCodeSheet() {
-        const sheet = this.book.getSheetByName("認証コード");
+        const sheet = this.getSheet("認証コード");
 
         return new AttendanceCodeSheet(sheet);
     }
 
     public getUserInfoSheet() {
-        const sheet = this.book.getSheetByName("ユーザー情報");
+        const sheet = this.getSheet("ユーザー情報");
 
         return new UserInfoSheet(sheet);
     }
@@ -47,13 +79,13 @@ class AdminActivityBook extends Book {
     }
 
     public getScheduleSheet() {
-        const sheet = this.book.getSheetByName("練習予定");
+        const sheet = this.getSheet("練習予定");
         
         return new ScheduleSheet(sheet);
     }
 
     public getMembersInfoSheet() {
-        const sheet = this.book.getSheetByName("乗り番");
+        const sheet = this.getSheet("乗り番");
 
         return new MembersInfoSheet(sheet);
     }
@@ -66,8 +98,8 @@ class AdminEventBook extends Book {
     constructor() {
         super("adminEventBookID");
 
-        this.adminEventSheet = new AdminEventSheet(this.book.getSheetByName("管理用"));
-        this.eventAttendanceSheet = new EventAttendanceSheet(this.book.getSheetByName("出欠表"));
+        this.adminEventSheet = new AdminEventSheet(this.getSheet("管理用"));
+        this.eventAttendanceSheet = new EventAttendanceSheet(this.getSheet("出欠表"));
     }
 
     public setEventInfo() {
@@ -83,7 +115,7 @@ class AttendanceBook extends Book {
 
     
     public getSheet(sheetName: string) {
-        const sheet = this.book.getSheetByName(sheetName);
+        const sheet = this.getSheet(sheetName);
         return new AttendanceSheet(sheet);
     }
 }
@@ -166,6 +198,11 @@ class MemberSheet extends Sheet {
   
   protected searchMember(id: string) {
       const memberRow = this.data.find((row) => row[2] === id);
+
+      // ユーザーが見つからなかった場合はエラーを返す
+        if (memberRow === undefined) {
+            throw new Error(`Member ${id} is not found.`);
+        }
       
       return memberRow;
   }
@@ -194,7 +231,7 @@ class AttendanceCodeSheet extends Sheet {
     private sendDiscord(code: string) {
         const today = new Today();
         
-        UrlFetchApp.fetch(PropertiesService.getScriptProperties().getProperty('AttendanceDiscordBotURL'), {
+        UrlFetchApp.fetch(new Property().getProperty('AttendanceDiscordBotURL'), {
             method: 'post',
             contentType: 'application/json',
             payload: JSON.stringify({
@@ -577,9 +614,9 @@ function doGet(e) {
 
             const contactListRows = sheet.getContactListRows();
 
-            let memberList = [];
+            let memberList: string[] = [];
             
-            let part = [];
+            let part: string[] = [];
 
             switch (e.parameter.type) {
                 case 'strings':
