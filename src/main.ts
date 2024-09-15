@@ -429,6 +429,10 @@ class MembersInfoSheet extends MemberSheet {
 
         return memberRow[9];
     }
+
+    public getCustomMemberList() {
+        return this.data.filter(row => row[8] === "TRUE").map(row => row[2]);
+    }
 }
 
 interface AttendRateInfo{
@@ -613,35 +617,41 @@ function doGet(e) {
             const contactListRows = sheet.getContactListRows();
 
             let memberList: string[] = [];
-            
-            let part: string[] = [];
 
-            switch (e.parameter.type) {
-                case 'strings':
-                    part = ['Vn', 'Va', 'Vc', 'Cb'];
-                    break;
+            if (e.parameter.type === 'custom') {
+                memberList = sheet.getCustomMemberList();
+            } else {
 
-                case 'brass':
-                    part = ['Tp', 'Hr', 'Trb'];
-                    break;
-
-                case 'woodwind':
-                    part = ['Fl', 'Ob', 'Cl', 'Fg'];
-                    break;
-
-                case 'percussion':
-                    part = ['Perc'];
-                    break;
-
-                case 'orchestra':
-                    part = ['Vn', 'Va', 'Vc', 'Cb', 'Tp', 'Hr', 'Trb', 'Fl', 'Fg', 'Ob', 'Cl', 'Perc'];
-            }
-
-            contactListRows.forEach(row => {
-                if (part.includes(row[3])) {
-                    memberList.push(row[2]);
+                let part: string[] = [];
+    
+                switch (e.parameter.type) {
+                    case 'strings':
+                        part = ['Vn', 'Va', 'Vc', 'Cb'];
+                        break;
+    
+                    case 'brass':
+                        part = ['Tp', 'Hr', 'Trb'];
+                        break;
+    
+                    case 'woodwind':
+                        part = ['Fl', 'Ob', 'Cl', 'Fg'];
+                        break;
+    
+                    case 'percussion':
+                        part = ['Perc'];
+                        break;
+    
+                    case 'orchestra':
+                        part = ['Vn', 'Va', 'Vc', 'Cb', 'Tp', 'Hr', 'Trb', 'Fl', 'Fg', 'Ob', 'Cl', 'Perc'];
                 }
-            });
+    
+                contactListRows.forEach(row => {
+                    if (part.includes(row[3])) {
+                        memberList.push(row[2]);
+                    }
+                });
+            }
+            
 
             const json = {
                 member_list: memberList
