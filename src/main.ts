@@ -178,6 +178,10 @@ class Sheet {
   protected appendRow(row: Array<string>): void {
     this.sheet.appendRow(row);
   }
+
+  protected sortCol(colNumber: number, type: boolean = true) {
+    this.sheet.sort(colNumber, type);
+  }
 }
   
 class MemberSheet extends Sheet {
@@ -385,6 +389,12 @@ class AttendanceSheet extends MemberSheet {
         const base = MemberRow[3];
         
         return { rate, base };
+    };
+
+    public sortClear() {
+        this.sortCol(2);
+        this.sortCol(7);
+        this.sortCol(6,false);
     };
 }
 
@@ -701,18 +711,31 @@ function regular() {
     
     const today = new Today();
 
-    if (!scheduleSheet.isActivityDate(today)) return; // もし、今日が練習日でないなら終了する
-
-    // 午前0時なら出欠列を生成
-    if (today.date.getHours() === 0) {
-        scheduleSheet.beginActivityDate(today);
+    if (!scheduleSheet.isActivityDate(today)){
+        // 午前0時なら出欠列を生成
+        if (today.date.getHours() === 0) {
+            scheduleSheet.beginActivityDate(today);
+        }
+    
+        // 認証コードを置き換える
+        const systemBook = new SystemBook();
+        const attendanceCodeSheet = systemBook.getAttendanceCodeSheet();
+    
+        attendanceCodeSheet.replaceCode();
     }
 
-    // 認証コードを置き換える
-    const systemBook = new SystemBook();
-    const attendanceCodeSheet = systemBook.getAttendanceCodeSheet();
+    const normalAttendanceBook = new NormalAttendanceBook();
+    const tuttiAttendanceBook = new TuttiAttendanceBook();
 
-    attendanceCodeSheet.replaceCode();
+    ['前曲', '中曲', 'メイン曲'].forEach((sheetName)=> {
+
+        const normalAttendanceSheet = normalAttendanceBook.getSheet(sheetName);
+        const tuttiAttendanceSheet = tuttiAttendanceBook.getSheet(sheetName);
+
+        [normalAttendanceSheet, tuttiAttendanceSheet].forEach((sheet)=>{
+            sheet.sortClear();
+        });
+    });
 }
 
 function setEventInfo() {
