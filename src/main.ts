@@ -144,7 +144,7 @@ class Sheet {
     const lastCol = sheet.getLastColumn();
 
     // 入力されているデータ全体を取得
-    this.data = sheet.getRange().getDisplayValues();
+    this.data = sheet.getRange(1, 1, lastRow, lastCol).getDisplayValues();
 
     // ==================================================================================
     const addRowNumbers = (matrix: string[][]): string[][] => {
