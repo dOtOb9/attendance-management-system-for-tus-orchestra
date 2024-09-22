@@ -140,11 +140,11 @@ class Sheet {
     this.sheet = sheet;
 
     // 入力されている右端のセルを取得
-    const last_row = sheet.getLastRow();
-    const last_col = sheet.getLastColumn();
+    const lastRow = sheet.getLastRow();
+    const lastCol = sheet.getLastColumn();
 
     // 入力されているデータ全体を取得
-    this.data = sheet.getRange(1, 1, last_row, last_col).getDisplayValues();
+    this.data = sheet.getRange().getDisplayValues();
 
     // ==================================================================================
     const addRowNumbers = (matrix: string[][]): string[][] => {
