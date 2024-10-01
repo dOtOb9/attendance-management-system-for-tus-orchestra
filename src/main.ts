@@ -634,7 +634,7 @@ function doGet(e) {
 
                 let part: string[] = [];
     
-                switch (e.parameter.type) {
+                switch (e.parameter.section) {
                     case 'strings':
                         part = ['Vn', 'Va', 'Vc', 'Cb'];
                         break;
