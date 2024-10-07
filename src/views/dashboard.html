@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
   <head>
     <base target="_top">
     <style>
@@ -7,10 +7,10 @@
     </style>
   </head>
   <body>
-    <div class="absolute left-0 top-0 h-screen w-screen bg-orange-50 p-0.5">
-      <div class="bg-white shadow-2xl p-10 m-20">
+    <div class="w-[100dvw] h-fit min-h-screen bg-orange-50 py-10">
+      <div class="mx-auto w-10/12 md:w-2/3 bg-white shadow-2xl p-5">
         <div class="border-b-4">
-          <h1 class="text-3xl font-sans font-bold text-orange-500 p-10">
+          <h1 class="text-3xl text-center font-sans font-bold text-orange-500 p-10">
             出席状況確認
           </h1>
         </div>
@@ -18,18 +18,18 @@
           <p class="text-xl border-b-2 p-4">
             通常練習の出席率
           </p>
-          <div class="justify-center p-4 space-x-5 flex">
+          <div class="grid grid-cols-auto-fit gap-5 p-4 text-center text-lg">
             <div class="flex-1 shadow-md rounded-md bg-gray-100">
-              <p class="text-center text-lg border-b-2 p-3">前曲</p>
-              <p class="text-center text-lg p-3"><?=attendanceNormalOverture?></p>
+              <p class="border-b-2 p-3">前曲</p>
+              <p class="p-3"><?=attendanceNormalOverture?></p>
             </div>
             <div class="flex-1 shadow-md rounded-md bg-gray-100">
-              <p class="text-center text-lg border-b-2 p-3">中曲</p>
-              <p class="text-center text-lg p-3"><?=attendanceNormalMiddle?></p>
+              <p class="border-b-2 p-3">中曲</p>
+              <p class="p-3"><?=attendanceNormalMiddle?></p>
             </div>
             <div class="flex-1 shadow-md rounded-md bg-gray-100">
-              <p class="text-center text-lg border-b-2 p-3">メイン曲</p>
-              <p class="text-center text-lg p-3"><?=attendanceNormalMain?></p>
+              <p class="border-b-2 p-3">メイン曲</p>
+              <p class="p-3"><?=attendanceNormalMain?></p>
             </div>
           </div>
         </div>
@@ -37,18 +37,18 @@
           <p class="text-xl border-b-2 p-4">
             Tutti練習の出席率
           </p>
-          <div class="justify-center p-4 space-x-5 flex">
+          <div class="grid grid-cols-auto-fit gap-5 p-4 text-center text-lg">
             <div class="flex-1 shadow-md rounded-md bg-gray-100">
-              <p class="text-center text-lg border-b-2 p-3">前曲</p>
-              <p class="text-center text-lg p-3"><?=attendanceTuttiOverture?></p>
+              <p class="border-b-2 p-3">前曲</p>
+              <p class="p-3"><?=attendanceTuttiOverture?></p>
             </div>
             <div class="flex-1 shadow-md rounded-md bg-gray-100">
-              <p class="text-center text-lg border-b-2 p-3">中曲</p>
-              <p class="text-center text-lg p-3"><?=attendanceTuttiMiddle?></p>
+              <p class="border-b-2 p-3">中曲</p>
+              <p class="p-3"><?=attendanceTuttiMiddle?></p>
             </div>
             <div class="flex-1 shadow-md rounded-md bg-gray-100">
-              <p class="text-center text-lg border-b-2 p-3">メイン曲</p>
-              <p class="text-center text-lg p-3"><?=attendanceTuttiMain?></p>
+              <p class="border-b-2 p-3">メイン曲</p>
+              <p class="p-3"><?=attendanceTuttiMain?></p>
             </div>
           </div>
         </div>
