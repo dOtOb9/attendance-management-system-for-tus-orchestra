@@ -1,0 +1,43 @@
+<!doctype html>
+<html>
+  <head>
+    <style>
+      <?!=cssContent?>
+    </style>
+  </head>
+  <body>
+    <div class="flex flex-col items-center justify-center min-h-screen ">
+      <h1 class="text-3xl text-center text-blue-600 h-14">東京理科大学管弦楽団</h1>
+      <div>
+        <h2 class="text-xl text-center">出欠表</h2>
+      </div>
+      <form id="attendanceForm" method="post" class="w-full max-w-md">
+        <input type="number" id="auth-code" min="1000" max="9999" placeholder="認証コードを入力してください。" autofocus class="bg-red-200 focus:bg-inherit text-xl font-bold text-center w-full p-2 border-inherit rounded bg-transparent focus:outline-none">
+      </form>
+    </div>
+  
+    <script>
+      document.getElementById('auth-code').addEventListener('input', function (e) {
+        // 数字以外の入力を防ぐ
+        this.value = this.value.replace(/[^0-9]/g, '');
+      
+        if (this.value.length === 4) {
+          // 4桁入力されたら自動でsubmit
+          const form = document.getElementById('attendanceForm');
+
+          if ("<?= env.code ?>" === this.value.toString()) {
+            const form = document.getElementById('attendanceForm');
+            form.innerHTML = '<h2 class="text-lime-700 text-xl font-bold text-center max-w-md w-full p-2">✅登録完了</h2>';
+            
+            google.script.run.withSuccessHandler(function (response) {
+              console.log(response);
+            }).registerAttendance(<?= env.id?>);
+          } 
+          else {
+            this.value = '';
+          }
+        }
+      });
+    </script>
+  </body>
+</html>
