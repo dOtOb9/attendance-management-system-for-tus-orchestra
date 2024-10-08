@@ -98,10 +98,31 @@ class AttendanceBook extends Book {
     }
 }
 
-class NormalAttendanceBook extends AttendanceBook {
+class StringsAttendanceBook extends AttendanceBook {
 
     constructor() {
-        super("normalAttendanceBookID");
+        super("stringsAttendanceBookID");
+    }
+}
+
+class WoodwindAttendanceBook extends AttendanceBook {
+
+    constructor() {
+        super("woodwindAttendanceBookID");
+    }
+}
+
+class BrassAttendanceBook extends AttendanceBook {
+
+    constructor() {
+        super("brassAttendanceBookID");
+    }
+}
+
+class PercussionAttendanceBook extends AttendanceBook {
+
+    constructor() {
+        super("percussionAttendanceBookID");
     }
 }
 
@@ -173,7 +194,7 @@ class Sheet {
   }
 }
   
-class MemberSheet extends Sheet {
+class MembersSheet extends Sheet {
   public editMember(memberRow: Array<string>): void {
       const userRow = this.searchMember(memberRow[1]);
 
@@ -222,7 +243,7 @@ class AttendanceCodeSheet extends Sheet {
     private sendDiscord(code: string) {
         const today = new Today();
         
-        UrlFetchApp.fetch(new Property().getProperty('AttendanceDiscordBotURL'), {
+        UrlFetchApp.fetch(new Property().getProperty('attendanceDiscordBotURL'), {
             method: 'post',
             contentType: 'application/json',
             payload: JSON.stringify({
@@ -267,16 +288,16 @@ class ScheduleSheet extends Sheet {
         // 列名が空白の行だけ取得
         const noneSetDateRows = this.data.filter(row => row[4] === "");
         
-        const noneSetNormalDateRows = noneSetDateRows.filter(row => row[5] === "Tutti");
+        const noneSetStringsDateRows = noneSetDateRows.filter(row => row[5] === "Tutti");
         const noneSetTuttiDateRows = noneSetDateRows.filter(row => row[5] !== "Tutti");
         
         // 通常練習、Tutti練習どちらも実行する
-        [noneSetNormalDateRows, noneSetTuttiDateRows].forEach((rows: Array<Array<string>>): void => {
+        [noneSetStringsDateRows, noneSetTuttiDateRows].forEach((rows: Array<Array<string>>): void => {
             // 追加する列がなければ終了する
             if (rows.length === 0) return;
             
             // Tutti列にチェックが入っているか、入っていないかの判定
-            const attendanceBook = rows[0][5] === "Tutti" ? new TuttiAttendanceBook() : new NormalAttendanceBook();
+            const attendanceBook = rows[0][5] === "Tutti" ? new TuttiAttendanceBook() : new StringsAttendanceBook();
             
             rows.forEach((row) => {
                 // 曲名から対象のシートを取得する
@@ -295,11 +316,11 @@ class ScheduleSheet extends Sheet {
         const todayRows = this.data.filter(row => row[1] === today.toString());
 
         const tuttiAttendanceBook = new TuttiAttendanceBook();
-        const normalAttendanceBook = new NormalAttendanceBook();
+        const stringsAttendanceBook = new StringsAttendanceBook();
         
         todayRows.forEach((row) => {
             // Tutti列にチェックが入っているか、入っていないかの判定
-            const attendanceBook = row[5] === "Tutti" ? tuttiAttendanceBook : normalAttendanceBook;
+            const attendanceBook = row[5] === "Tutti" ? tuttiAttendanceBook : stringsAttendanceBook;
             
             // 曲名から対象のシートを取得する
             const attendanceSheet = attendanceBook.getSheet(row[3]);
@@ -325,7 +346,7 @@ class ScheduleSheet extends Sheet {
     }
 }
 
-class AttendanceSheet extends MemberSheet {
+class AttendanceSheet extends MembersSheet {
 
     override editMember(memberRow: Array<string>) {
         const newRowNumber = this.data.length;
@@ -400,7 +421,7 @@ class AttendanceSheet extends MemberSheet {
     };
 }
 
-class MembersInfoSheet extends MemberSheet {
+class MembersInfoSheet extends MembersSheet {
     
     public addContactList(id: string) {
         const userRow = this.searchMember(id);
@@ -457,12 +478,12 @@ interface AttendRateData {
 
 class AttendanceStatus {
     private readonly id: string;
-    private normalAttendRateInfo: AttendRateInfo;
+    private stringsAttendRateInfo: AttendRateInfo;
     private tuttiAttendRateInfo: AttendRateInfo;
     
     constructor(id: string) {
         this.id = id;
-        this.normalAttendRateInfo = this.getAttendRateStatus(new NormalAttendanceBook());
+        this.stringsAttendRateInfo = this.getAttendRateStatus(new StringsAttendanceBook());
         this.tuttiAttendRateInfo = this.getAttendRateStatus(new TuttiAttendanceBook());
     }
     
@@ -478,14 +499,14 @@ class AttendanceStatus {
         return JSON.stringify({
             'attend_status': `
             **前曲**
-            出席率 ... ${this.normalAttendRateInfo.overture.rate}
-            母数 ... ${this.normalAttendRateInfo.overture.base}
+            出席率 ... ${this.stringsAttendRateInfo.overture.rate}
+            母数 ... ${this.stringsAttendRateInfo.overture.base}
             **中曲**
-            出席率 ... ${this.normalAttendRateInfo.middle.rate}
-            母数 ... ${this.normalAttendRateInfo.middle.base}
+            出席率 ... ${this.stringsAttendRateInfo.middle.rate}
+            母数 ... ${this.stringsAttendRateInfo.middle.base}
             **メイン１**
-            出席率 ... ${this.normalAttendRateInfo.main.rate}
-            母数 ... ${this.normalAttendRateInfo.main.base}
+            出席率 ... ${this.stringsAttendRateInfo.main.rate}
+            母数 ... ${this.stringsAttendRateInfo.main.base}
             `,
             'tutti_attend_status': `
             **前曲**
@@ -532,10 +553,10 @@ class Member {
 
         memberInfoSheet.editMember(memberRow);
 
-        const normalAttendanceBook = new NormalAttendanceBook();
+        const stringsAttendanceBook = new StringsAttendanceBook();
         const tuttiAttendanceBook = new TuttiAttendanceBook();
 
-        [normalAttendanceBook, tuttiAttendanceBook].forEach(book => {
+        [stringsAttendanceBook, tuttiAttendanceBook].forEach(book => {
             ['前曲', '中曲', 'メイン１'].forEach(section => {
                 const attendanceSheet = book.getSheet(section);
 
@@ -559,7 +580,7 @@ class setAttendance {
         const nowTermRows = scheduleSheet.getNowTermRow();
 
         nowTermRows.forEach(row => {
-            const attendanceSheet = row[2] === 'TRUE' ? new TuttiAttendanceBook().getSheet(row[3]) : new NormalAttendanceBook().getSheet(row[3]);
+            const attendanceSheet = row[2] === 'TRUE' ? new TuttiAttendanceBook().getSheet(row[3]) : new StringsAttendanceBook().getSheet(row[3]);
 
             attendanceSheet.setAttend(this.member.id, Number(row[4]));
         });
@@ -573,20 +594,20 @@ function doGet(e) {
 
     switch (mode) {
         case 'dashboard':
-            const normalAttendanceBook = new NormalAttendanceBook();
+            const stringsAttendanceBook = new StringsAttendanceBook();
             const tuttiAttendanceBook = new TuttiAttendanceBook();
 
 
             const member = new Member(e.parameter.id);
 
-            const normalAttendRateStatus = member.attendanceStatus.getAttendRateStatus(normalAttendanceBook);
+            const stringsAttendRateStatus = member.attendanceStatus.getAttendRateStatus(stringsAttendanceBook);
             const tuttiAttendRateStatus = member.attendanceStatus.getAttendRateStatus(tuttiAttendanceBook);
             
             const dashboardHtml = HtmlService.createTemplateFromFile('src/views/dashboard');
 
-            dashboardHtml.attendanceNormalOverture = normalAttendRateStatus.overture.rate;
-            dashboardHtml.attendanceNormalMiddle = normalAttendRateStatus.middle.rate;
-            dashboardHtml.attendanceNormalMain = normalAttendRateStatus.main.rate;
+            dashboardHtml.attendanceStringsOverture = stringsAttendRateStatus.overture.rate;
+            dashboardHtml.attendanceStringsMiddle = stringsAttendRateStatus.middle.rate;
+            dashboardHtml.attendanceStringsMain = stringsAttendRateStatus.main.rate;
 
             dashboardHtml.attendanceTuttiOverture = tuttiAttendRateStatus.overture.rate;
             dashboardHtml.attendanceTuttiMiddle = tuttiAttendRateStatus.middle.rate;
@@ -727,15 +748,15 @@ function regular() {
         attendanceCodeSheet.replaceCode();
     }
 
-    const normalAttendanceBook = new NormalAttendanceBook();
+    const stringsAttendanceBook = new StringsAttendanceBook();
     const tuttiAttendanceBook = new TuttiAttendanceBook();
 
     ['前曲', '中曲', 'メイン１', 'メイン２', 'メイン３', 'メイン４'].forEach((sheetName)=> {
 
-        const normalAttendanceSheet = normalAttendanceBook.getSheet(sheetName);
+        const stringsAttendanceSheet = stringsAttendanceBook.getSheet(sheetName);
         const tuttiAttendanceSheet = tuttiAttendanceBook.getSheet(sheetName);
 
-        [normalAttendanceSheet, tuttiAttendanceSheet].forEach((sheet)=>{
+        [stringsAttendanceSheet, tuttiAttendanceSheet].forEach((sheet)=>{
             sheet.sortClear();
         });
     });

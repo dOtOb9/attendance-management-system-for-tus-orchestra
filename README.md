@@ -5,8 +5,11 @@ The TUS Orchestra is a student orchestra from the Tokyo University of Science. W
 # Environmental Variables
 | Variable Name               | Description                              | 
 | --------------------------- | ---------------------------------------  |
-| normalAttendanceBookID      | SpreadSheetApp's ID                      |
+| stringsAttendanceBookID     | SpreadSheetApp's ID                      |
+| woodwindAttendanceBookID    | SpreadSheetApp's ID                      |
+| brassAttendanceBookID       | SpreadSheetApp's ID                      |
+| percussionAttendanceBookID  | SpreadSheetApp's ID                      |
 | tuttiAttendanceBookID       | SpreadSheetApp's ID                      |
-| SystemBookID                | SpreadSheetApp's ID                      |
+| systemBookID                | SpreadSheetApp's ID                      |
 | adminActivityBookID         | SpreadSheetApp's ID                      |
-| AttendanceDiscordBotURL     | Sends attendance code to Discord channel |
+| attendanceDiscordBotURL     | Sends attendance code to Discord channel |
