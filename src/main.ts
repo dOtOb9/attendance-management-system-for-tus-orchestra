@@ -468,7 +468,10 @@ class MembersInfoSheet extends MembersSheet {
 interface AttendRateInfo{
     overture: AttendRateData;
     middle: AttendRateData;
-    main: AttendRateData;
+    main1: AttendRateData;
+    main2: AttendRateData;
+    main3: AttendRateData;
+    main4: AttendRateData;
 }
 
 interface AttendRateData {
@@ -490,9 +493,12 @@ class AttendanceStatus {
     public getAttendRateStatus(attendanceBook: AttendanceBook): AttendRateInfo {
         const overture = attendanceBook.getSheet('前曲').getMemberAttendanceRateAndBase(this.id);
         const middle = attendanceBook.getSheet('中曲').getMemberAttendanceRateAndBase(this.id);
-        const main = attendanceBook.getSheet('メイン１').getMemberAttendanceRateAndBase(this.id);
+        const main1 = attendanceBook.getSheet('メイン１').getMemberAttendanceRateAndBase(this.id);
+        const main2 = attendanceBook.getSheet('メイン２').getMemberAttendanceRateAndBase(this.id);
+        const main3 = attendanceBook.getSheet('メイン３').getMemberAttendanceRateAndBase(this.id);
+        const main4 = attendanceBook.getSheet('メイン４').getMemberAttendanceRateAndBase(this.id);
         
-        return { overture, middle, main };
+        return { overture, middle, main1, main2, main3, main4 };
     }
     
     public discordFormat(): string{
@@ -505,8 +511,17 @@ class AttendanceStatus {
             出席率 ... ${this.stringsAttendRateInfo.middle.rate}
             母数 ... ${this.stringsAttendRateInfo.middle.base}
             **メイン１**
-            出席率 ... ${this.stringsAttendRateInfo.main.rate}
-            母数 ... ${this.stringsAttendRateInfo.main.base}
+            出席率 ... ${this.stringsAttendRateInfo.main1.rate}
+            母数 ... ${this.stringsAttendRateInfo.main2.base}
+            **メイン２**
+            出席率 ... ${this.stringsAttendRateInfo.main2.rate}
+            母数 ... ${this.stringsAttendRateInfo.main2.base}
+            **メイン３**
+            出席率 ... ${this.stringsAttendRateInfo.main3.rate}
+            母数 ... ${this.stringsAttendRateInfo.main3.base}
+            **メイン４**
+            出席率 ... ${this.stringsAttendRateInfo.main4.rate}
+            母数 ... ${this.stringsAttendRateInfo.main4.base}
             `,
             'tutti_attend_status': `
             **前曲**
@@ -516,8 +531,17 @@ class AttendanceStatus {
             出席率 ... ${this.tuttiAttendRateInfo.middle.rate}
             母数 ... ${this.tuttiAttendRateInfo.middle.base}
             **メイン１**
-            出席率 ... ${this.tuttiAttendRateInfo.main.rate}
-            母数 ... ${this.tuttiAttendRateInfo.main.base}
+            出席率 ... ${this.tuttiAttendRateInfo.main1.rate}
+            母数 ... ${this.tuttiAttendRateInfo.main1.base}
+            **メイン２**
+            出席率 ... ${this.tuttiAttendRateInfo.main2.rate}
+            母数 ... ${this.tuttiAttendRateInfo.main2.base}
+            **メイン３**
+            出席率 ... ${this.tuttiAttendRateInfo.main3.rate}
+            母数 ... ${this.tuttiAttendRateInfo.main3.base}
+            **メイン４**
+            出席率 ... ${this.tuttiAttendRateInfo.main4.rate}
+            母数 ... ${this.tuttiAttendRateInfo.main4.base}
             `,        
         })
     }
@@ -605,13 +629,19 @@ function doGet(e) {
             
             const dashboardHtml = HtmlService.createTemplateFromFile('src/views/dashboard');
 
-            dashboardHtml.attendanceStringsOverture = stringsAttendRateStatus.overture.rate;
-            dashboardHtml.attendanceStringsMiddle = stringsAttendRateStatus.middle.rate;
-            dashboardHtml.attendanceStringsMain = stringsAttendRateStatus.main.rate;
+            dashboardHtml.attendanceNormalOverture = stringsAttendRateStatus.overture.rate;
+            dashboardHtml.attendanceNormalMiddle = stringsAttendRateStatus.middle.rate;
+            dashboardHtml.attendanceNormalMain1 = stringsAttendRateStatus.main1.rate;
+            dashboardHtml.attendanceNormalMain2 = stringsAttendRateStatus.main2.rate;
+            dashboardHtml.attendanceNormalMain3 = stringsAttendRateStatus.main3.rate;
+            dashboardHtml.attendanceNormalMain4 = stringsAttendRateStatus.main4.rate;
 
             dashboardHtml.attendanceTuttiOverture = tuttiAttendRateStatus.overture.rate;
             dashboardHtml.attendanceTuttiMiddle = tuttiAttendRateStatus.middle.rate;
-            dashboardHtml.attendanceTuttiMain = tuttiAttendRateStatus.main.rate;
+            dashboardHtml.attendanceTuttiMain1 = tuttiAttendRateStatus.main1.rate;
+            dashboardHtml.attendanceTuttiMain2 = tuttiAttendRateStatus.main2.rate;
+            dashboardHtml.attendanceTuttiMain3 = tuttiAttendRateStatus.main3.rate;
+            dashboardHtml.attendanceTuttiMain4 = tuttiAttendRateStatus.main4.rate;
 
             dashboardHtml.cssContent = HtmlService.createHtmlOutputFromFile('src/views/dashboard-css').getContent();
             const dashboardHtmlOutput = dashboardHtml.evaluate();
