@@ -243,7 +243,7 @@ class AttendanceCodeSheet extends Sheet {
     private sendDiscord(code: string) {
         const today = new Today();
         
-        UrlFetchApp.fetch(new Property().getProperty('attendanceDiscordBotURL'), {
+        UrlFetchApp.fetch(new Property().getProperty('AttendanceDiscordBotURL'), {
             method: 'post',
             contentType: 'application/json',
             payload: JSON.stringify({
