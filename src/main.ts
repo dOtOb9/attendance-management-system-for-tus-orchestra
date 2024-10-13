@@ -758,13 +758,13 @@ function regular() {
     const adminAcrivtyBook = new AdminActivityBook();
     const scheduleSheet = adminAcrivtyBook.getScheduleSheet();
     
-    scheduleSheet.setActivityDate();
     const today = new Today();
     
     if (scheduleSheet.isActivityDate(today)){
         // 午前0時なら出欠列を生成
+        scheduleSheet.setActivityDate();
         if (today.date.getHours() === 0) {
-            // 出欠列の生成
+
             const membersInfoSheet = adminAcrivtyBook.getMembersInfoSheet();
 
             // 欠席と降り番の入力をする
