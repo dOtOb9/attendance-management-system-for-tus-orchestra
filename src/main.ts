@@ -762,8 +762,8 @@ function regular() {
     
     if (scheduleSheet.isActivityDate(today)){
         // 午前0時なら出欠列を生成
-        scheduleSheet.setActivityDate();
         if (today.date.getHours() === 0) {
+            scheduleSheet.setActivityDate();
 
             const membersInfoSheet = adminAcrivtyBook.getMembersInfoSheet();
 
