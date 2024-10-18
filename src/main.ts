@@ -657,6 +657,25 @@ function doGet(e) {
             const response = JSON.stringify(json);
             
             return ContentService.createTextOutput(response);
+
+        case 'verify_attendance':
+            const attendanceCodeSheet = new AdminBook().getAttendanceCodeSheet();
+
+            const code = attendanceCodeSheet.getCode();
+
+            const verifyAttendanceHtml = HtmlService.createTemplateFromFile('src/views/verify-attendance-form');
+    
+            verifyAttendanceHtml.env = {
+                id: e.parameter.id,
+                code: code
+            }
+                
+            verifyAttendanceHtml.cssContent = HtmlService.createHtmlOutputFromFile('src/views/verify-attendance-form-css').getContent();
+            const verifyAttendanceHtmlOutput = verifyAttendanceHtml.evaluate();
+    
+            verifyAttendanceHtmlOutput.addMetaTag('viewport', 'width=device-width, initial-scale=1')
+    
+            return verifyAttendanceHtmlOutput;
     }
 }
 
