@@ -293,7 +293,7 @@ class ScheduleSheet extends Sheet {
                 
                 const attendanceSheet = attendanceBook.getSheet(tuneName);
                 // 日付の出欠列を生成し、生成した列の右端から数えた列数を返す
-                const dateColNumber = attendanceSheet.setAttendanceCol(row[1], memberIds[tuneName]);
+                const dateColNumber = attendanceSheet.createAttendanceCol(row[1], memberIds[tuneName]);
                 
                 // 生成した列の位置を記録する
                 this.setValue(Number(row[0]), 4, dateColNumber.toString());
@@ -332,7 +332,7 @@ class AttendanceSheet extends MembersSheet {
         super.editMember(attendanceMemberRow);
     }
     
-    public setAttendanceCol(date: string, memberIds: Array<string>): number {
+    public createAttendanceCol(date: string, memberIds: Array<string>): number {
         const dateColNumber = this.createColumnsLeft(date, 8, 1);
 
         this.setAbsense(dateColNumber);
