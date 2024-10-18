@@ -10,6 +10,5 @@ The TUS Orchestra is a student orchestra from the Tokyo University of Science. W
 | brassAttendanceBookID       | SpreadSheetApp's ID                      |
 | percussionAttendanceBookID  | SpreadSheetApp's ID                      |
 | tuttiAttendanceBookID       | SpreadSheetApp's ID                      |
-| systemBookID                | SpreadSheetApp's ID                      |
-| adminActivityBookID         | SpreadSheetApp's ID                      |
+| adminBookID                 | SpreadSheetApp's ID                      |
 | attendanceDiscordBotURL     | Sends attendance code to Discord channel |
